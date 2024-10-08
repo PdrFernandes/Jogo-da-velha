@@ -11,27 +11,39 @@ public class ClientMain {
     static int port = 12345;
     static String localHost = "127.0.0.1";
     static boolean flag = true;
+    static boolean flag_login = true;
     static String name;
     static Socket socket;
     static boolean isPlaying = false;
 
-    public static void main(String[] args) throws IOException {
-        System.out.println("Digite seu nome de usuario: ");
-        Scanner scanner = new Scanner(System.in);
-        name = scanner.nextLine();
-
+    public static void main(String[] args) throws IOException, InterruptedException {
         socket = new Socket(localHost, port);
 
-        DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-        outputStream.writeBytes( name + "\n");
-
         ClientThread clientThread = new ClientThread(socket);
-        clientThread.setName(name);
         clientThread.start();
 
-        while (flag) {
+        while (flag_login) {
+            System.out.println("Digite seu nome de usuario: ");
+            Scanner scanner = new Scanner(System.in);
+            name = scanner.nextLine();
 
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeBytes(name + "\n");
+
+            System.out.println("Digite sua senha: ");
             scanner = new Scanner(System.in);
+            String psswrd = scanner.nextLine();
+
+            outputStream.writeBytes(psswrd + "\n");
+            Thread.sleep(1500);
+        }
+
+        clientThread.setName(name);
+
+
+        while (flag) {
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            Scanner scanner = new Scanner(System.in);
             String comando = scanner.nextLine();
 
             switch (comando) {

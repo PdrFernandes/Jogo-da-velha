@@ -2,12 +2,11 @@ package client;
 
 import java.io.*;
 import java.net.*;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.*;
 
 import static client.ClientMain.flag;
-import static server.ServerMain.onlineClients;
+import static client.ClientMain.flag_login;
 
 // Cuida das menssagens a serem recebidas do servidor
 public class ClientThread extends Thread{
@@ -46,6 +45,9 @@ public class ClientThread extends Thread{
                     case "D":
                         System.out.println("Você foi desconectado");
                         continue;
+                    case "E":
+                        loginMsg(msgFields);
+                        break;
                     default:
                         System.out.println(msg);
                         break;
@@ -64,5 +66,12 @@ public class ClientThread extends Thread{
             if (Objects.equals(msgField[i], this.getName())) System.out.println(msgField[i] + " (você)");
             else System.out.println(msgField[i]);
         }
+    }
+
+    void loginMsg(String[] msgField){
+        if (Objects.equals(msgField[1], "1")) {
+            flag_login = false;
+            System.out.println("Voce realizou o login com sucesso!");
+        } else System.out.println("Usuario e/ou senha errados");
     }
 }

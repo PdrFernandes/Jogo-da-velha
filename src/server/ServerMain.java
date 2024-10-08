@@ -2,6 +2,7 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class ServerMain {
@@ -10,7 +11,7 @@ public class ServerMain {
     static int port = 12345;
     public static HashMap<String, Socket> onlineClients = new HashMap<>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         ServerSocket serverSocket = new ServerSocket(port);
 
         while (true){
@@ -18,14 +19,6 @@ public class ServerMain {
             socket = serverSocket.accept();
 
             ThreadServer threadServer = new ThreadServer(socket);
-            count++;
-
-            DataInputStream entrada = new DataInputStream(socket.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entrada));
-            String name = bufferedReader.readLine();
-
-            threadServer.setName(name);
-            onlineClients.put(threadServer.getName(), socket);
             System.out.println(threadServer.getName() + " conectado");
             threadServer.start();
         }
