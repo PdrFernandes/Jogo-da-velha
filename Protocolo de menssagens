@@ -1,0 +1,8 @@
+O protocolo de mensagens é definido pelos 8 primeiros bits ou primeiro byte que são envidaso, eles estão
+definidos como uma letra em maiusculo, em seguida seus campos são divididos pelo caractere ";" e variam
+conforme a mensagem tendo um tamanho maximo de (a definir, provavel 32) bytes e é finalizada po "\n",
+pois para ler está sendo utilizado o metodo readLine. (podia definir o primeiro campo e depois disso os
+bytes eram dividos automaticamente sem precisar de separador e só os numero do byte mas como da mais trabalho fiz assim)
+
+Messsagem entre usuarios: (TCP, não se pode perder a msg)
+    A;Cliente de origem;Cliente de destino;Menssagem
