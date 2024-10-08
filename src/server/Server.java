@@ -1,5 +1,3 @@
-package server;
-
 import java.util.*;
 import java.sql.*;
 
@@ -17,41 +15,10 @@ public class Server {
     	 * del_amizade: deleta amizade pelo ID dos amigos
     	 * del_usuario: deleta usuário por ID
     	 * */
-    	
-        try {
-			
-			System.out.println("BUSCA COM TODOS ADICIONADOS");
-			System.out.println("---------------------------");
-			List<Map<String, Object>> busca = sel_usuario_username("");
-            System.out.println(busca.toString());
-			
-//            ins_amizade(12, 13);
-//            ins_amizade(12, 14);
-//            ins_amizade(13, 14);
-//            System.out.println("BUSCA AMIZADES");
-//            System.out.println("---------------------------");
-//            List<Map<String, Object>> busca_amizade_todos = sel_amizade(null, null);
-//        	System.out.println(busca_amizade_todos.toString());
-//
-//            System.out.println("BUSCA AMIZADES DE 1");
-//            System.out.println("---------------------------");
-//            List<Map<String, Object>> busca_amizade = sel_amizade(12, null);
-//            System.out.println(busca_amizade.toString());
-//
-//            System.out.println("BUSCA AMIZADES DE 2 e 3");
-//            System.out.println("---------------------------");
-//            List<Map<String, Object>> busca_amizade_2 = sel_amizade(13, 14);
-//            System.out.println(busca_amizade_2.toString());
-//
-//            del_amizade(12, 13);
-//            del_amizade(12, 14);
-//            del_amizade(13, 14);
-//            del_usuario(12);
-//            del_usuario(13);
-//            del_usuario(14);
-		} 
-        
-        catch (SQLException e) {
+    	try {
+			System.out.println(sel_usuario(15).toString());
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -167,6 +134,48 @@ public class Server {
             //Define os parâmetros (precisam ser definidos em ordem, ver procedure para saber a ordem)
             if (username == null) call.setNull(1, java.sql.Types.NVARCHAR);
             else call.setString(1, username);
+            
+            //Executa a procedure
+            call.execute();
+
+           rs = call.getResultSet();
+           
+           Map<String, Object> row = null;
+
+           ResultSetMetaData metaData = rs.getMetaData();
+           Integer columnCount = metaData.getColumnCount();
+
+           while (rs.next()) {
+               row = new HashMap<String, Object>();
+               for (int i = 1; i <= columnCount; i++) {
+                   row.put(metaData.getColumnName(i), rs.getObject(i));
+               }
+               resultList.add(row);
+           }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return resultList;
+    }
+    
+    /*SEL_USUARIO
+     * PARÂMETROS: 
+     * - id: id do usuário (OPCIONAL))
+     * RETORNO: ResultSet
+     * */
+    public static List<Map<String, Object>> sel_usuario(Integer id) throws SQLException {
+    	ResultSet rs = null;
+    	List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+    	
+        //Tenta estabelecer a conexão
+        try (Connection con = DriverManager.getConnection(Server.connectionUrl);) {
+            CallableStatement call = con.prepareCall("{ call sel_usuario(?) }");
+            //Define os parâmetros (precisam ser definidos em ordem, ver procedure para saber a ordem)
+            if (id == null) call.setNull(1, java.sql.Types.NVARCHAR);
+            else call.setInt(1, id);
+            
             
             //Executa a procedure
             call.execute();
