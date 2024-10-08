@@ -1,3 +1,5 @@
+package server;
+
 import java.util.*;
 import java.sql.*;
 
@@ -23,30 +25,30 @@ public class Server {
 			List<Map<String, Object>> busca = sel_usuario_username("");
             System.out.println(busca.toString());
 			
-            ins_amizade(12, 13);
-            ins_amizade(12, 14);
-            ins_amizade(13, 14);
-            System.out.println("BUSCA AMIZADES");
-            System.out.println("---------------------------");
-            List<Map<String, Object>> busca_amizade_todos = sel_amizade(null, null);
-        	System.out.println(busca_amizade_todos.toString());
-        	
-            System.out.println("BUSCA AMIZADES DE 1");
-            System.out.println("---------------------------");
-            List<Map<String, Object>> busca_amizade = sel_amizade(12, null);
-            System.out.println(busca_amizade.toString());
-            
-            System.out.println("BUSCA AMIZADES DE 2 e 3");
-            System.out.println("---------------------------");
-            List<Map<String, Object>> busca_amizade_2 = sel_amizade(13, 14);
-            System.out.println(busca_amizade_2.toString());
-            
-            del_amizade(12, 13);
-            del_amizade(12, 14);
-            del_amizade(13, 14);
-            del_usuario(12);
-            del_usuario(13);
-            del_usuario(14);
+//            ins_amizade(12, 13);
+//            ins_amizade(12, 14);
+//            ins_amizade(13, 14);
+//            System.out.println("BUSCA AMIZADES");
+//            System.out.println("---------------------------");
+//            List<Map<String, Object>> busca_amizade_todos = sel_amizade(null, null);
+//        	System.out.println(busca_amizade_todos.toString());
+//
+//            System.out.println("BUSCA AMIZADES DE 1");
+//            System.out.println("---------------------------");
+//            List<Map<String, Object>> busca_amizade = sel_amizade(12, null);
+//            System.out.println(busca_amizade.toString());
+//
+//            System.out.println("BUSCA AMIZADES DE 2 e 3");
+//            System.out.println("---------------------------");
+//            List<Map<String, Object>> busca_amizade_2 = sel_amizade(13, 14);
+//            System.out.println(busca_amizade_2.toString());
+//
+//            del_amizade(12, 13);
+//            del_amizade(12, 14);
+//            del_amizade(13, 14);
+//            del_usuario(12);
+//            del_usuario(13);
+//            del_usuario(14);
 		} 
         
         catch (SQLException e) {
