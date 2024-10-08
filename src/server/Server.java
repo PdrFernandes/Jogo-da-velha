@@ -160,11 +160,9 @@ public class Server {
         return resultList;
     }
     
-    /*LOGIN
+    /*SEL_USUARIO
      * PARÂMETROS: 
-     * - username: username do usuário (OBRIGATÓRIO)
-     * - senha: senha do usuário (OBRIGATÓRIO)
-     * (Caso nenhum usuário seja retornado, usuário e/ou senha incorretos)
+     * - id: id do usuário (OPCIONAL))
      * RETORNO: ResultSet
      * */
     public static List<Map<String, Object>> sel_usuario(Integer id) throws SQLException {
