@@ -35,6 +35,8 @@ public class ThreadServer extends Thread{
                 bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 String psswrd = bufferedReader.readLine();
 
+                System.out.println(name + " " + psswrd);
+
                 List<Map<String, Object>> loginList = sel_login(name, psswrd);
 
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());

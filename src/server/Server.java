@@ -18,7 +18,7 @@ public class Server {
     	 * del_usuario: deleta usuário por ID
     	 * */
     	try {
-			System.out.println(sel_usuario(15).toString());
+			System.out.println(sel_usuario_username("").toString());
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

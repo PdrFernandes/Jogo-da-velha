@@ -19,8 +19,8 @@ public class ClientMain {
     public static void main(String[] args) throws IOException, InterruptedException {
         socket = new Socket(localHost, port);
 
-        ClientThread clientThread = new ClientThread(socket);
-        clientThread.start();
+        //ClientThread clientThread = new ClientThread(socket);
+        //clientThread.start();
 
         while (flag_login) {
             System.out.println("Digite seu nome de usuario: ");
@@ -38,7 +38,7 @@ public class ClientMain {
             Thread.sleep(1500);
         }
 
-        clientThread.setName(name);
+        //clientThread.setName(name);
 
 
         while (flag) {
@@ -58,7 +58,7 @@ public class ClientMain {
                     isPlaying = true;
                     break;
                 case "D":
-                    clientThread.interrupt();
+                    //clientThread.interrupt();
                     disconnect();
                     flag = false;
                     continue;

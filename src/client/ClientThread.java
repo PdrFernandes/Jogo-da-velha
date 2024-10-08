@@ -1,7 +1,11 @@
 package client;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.*;
 
@@ -13,8 +17,33 @@ public class ClientThread extends Thread{
     Socket socket;
     String msg = "";
 
-    public ClientThread(Socket socket) {
+    private FrameClientMain frameClientMain;
+
+    private JPanel jallPanel;
+    private JPanel jconnectionPanel;
+    private JPanel jmsgPanel;
+    private JPanel juserDataPanel;
+    private JPanel jusersPanel;
+    private JPanel jgamePanel;
+    private JTextField jipTextField;
+    private JTextField jportTextField;
+    private JButton jconnectButton;
+    private JButton jdesconectarButton;
+    private JPasswordField jpasswordField;
+    private JTextField jusernameTextField;
+    private JButton jloginButton;
+    private JList<String> jList;
+
+
+    public ClientThread(Socket socket, FrameClientMain frameClientMain, JButton jloginButton, JTextField jusernameTextField,
+                        JPasswordField jpasswordField, JButton jdesconectarButton, JList<String> jList) {
         this.socket = socket;
+        this.frameClientMain = frameClientMain;
+        this.jloginButton = jloginButton;
+        this.jusernameTextField = jusernameTextField;
+        this.jpasswordField = jpasswordField;
+        this.jdesconectarButton = jdesconectarButton;
+        this.jList = jList;
     }
 
     @Override
@@ -61,17 +90,30 @@ public class ClientThread extends Thread{
     }
 
     void displayOnlineClients (String[] msgField){
-        System.out.println("Clientes online: ");
-        for (int i = 1; i < msgField.length; i++) {
-            if (Objects.equals(msgField[i], this.getName())) System.out.println(msgField[i] + " (você)");
-            else System.out.println(msgField[i]);
+        ArrayList<String> usuariosOnline = new ArrayList<>();
+        usuariosOnline.addAll(Arrays.asList(msgField));
+        usuariosOnline.removeFirst();
+
+        DefaultListModel model = new DefaultListModel();
+        this.jList.setModel(model);
+        model.clear();
+
+        for(String usuario: usuariosOnline){
+            model.addElement(usuario);
         }
     }
 
     void loginMsg(String[] msgField){
         if (Objects.equals(msgField[1], "1")) {
             flag_login = false;
+            this.frameClientMain.desabilitarTextField(jusernameTextField);
+            jpasswordField.setEditable(false);
+            jpasswordField.setBackground(Color.GRAY);
             System.out.println("Voce realizou o login com sucesso!");
-        } else System.out.println("Usuario e/ou senha errados");
+        } else {
+            jloginButton.setVisible(true);
+            jusernameTextField.setText("Usuario e/ou senha errados. Tente novamente");
+            System.out.println("Usuario e/ou senha errados");
+        }
     }
 }
