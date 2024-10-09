@@ -14,7 +14,7 @@ public class FrameClientMain extends JFrame{
 
     static int port = 12345;
     static String localHost = "127.0.0.1";
-    static boolean flag = true;
+    static boolean desconectou = false;
     static boolean flag_login = true;
     static String name;
     static Socket socket;
@@ -41,6 +41,19 @@ public class FrameClientMain extends JFrame{
     private JButton jsendMsgButton;
     private JButton jrefreshOnButton;
     private JList<String> jlist1;
+    private JScrollPane juserListScrollPane;
+    private JScrollPane jmsgScrollPane;
+    private JTextArea jgametextArea;
+    private JButton jgame4Button;
+    private JButton jgame5Button;
+    private JButton jgame6Button;
+    private JButton jgame1Button;
+    private JButton jgame2Button;
+    private JButton jgame3Button;
+    private JButton jgame7Button;
+    private JButton jgame8Button;
+    private JButton jgame9Button;
+    private JButton jplayButton;
 
 
     public FrameClientMain() {
@@ -74,17 +87,24 @@ public class FrameClientMain extends JFrame{
                 buttonAtualizarPressed(e);
             }
         });
+        jplayButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonJogarPressed(e);
+            }
+        });
     }
 
+    //Comandos quando o botão conectar é pressionado
     private void buttonConectarPressed (ActionEvent event) {
         try {
             socket = new Socket(jipTextField.getText(), Integer.parseInt(jportTextField.getText()));
 
-            clientThread = new ClientThread(socket, jFrame,jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1);
+            clientThread = new ClientThread(socket, jFrame, jconnectionPanel, jipTextField, jportTextField, jconnectButton,
+                    juserDataPanel, jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1, jusersPanel, jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField);
+
             clientThread.start();
 
-            desabilitarTextField(jipTextField);
-            desabilitarTextField(jportTextField);
             jconnectionPanel.setVisible(false);
             juserDataPanel.setVisible(true);
 
@@ -93,8 +113,8 @@ public class FrameClientMain extends JFrame{
         }
     }
 
+    //Comandos quando o botão desconectar é pressionado
     private void buttonDesonectarPressed (ActionEvent event) {
-        clientThread.interrupt();
 
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -105,6 +125,7 @@ public class FrameClientMain extends JFrame{
         }
     }
 
+    //Comandos quando o botão logar é pressionado
     private void buttonLogarPressed(ActionEvent event){
 
         try {
@@ -118,17 +139,44 @@ public class FrameClientMain extends JFrame{
         }
     }
 
+    //Comandos quando o botão enviar é pressionado
     private void buttonEnviarPressed(ActionEvent event){
+        if (!jlist1.isSelectionEmpty()) {
+            try {
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes( "A;" + jusernameTextField.getText() + ";" + jlist1.getSelectedValue() + ";" + jsendMsgTextField.getText() + "\n");
 
+            } catch (IOException ex) {
+                Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            jmsgTextArea.append("Selecione um jogador antes de enviar menssagem!");
+            jmsgTextArea.setCaretPosition(jmsgTextArea.getDocument().getLength() - 1);
+        }
     }
 
+    //Comandos quando o botão atualizar é pressionado
     private void buttonAtualizarPressed(ActionEvent event){
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes( "B\n");
 
         } catch (IOException ex) {
-            Logger.getLogger(ClientMain.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void buttonJogarPressed(ActionEvent event){
+        if (!jlist1.isSelectionEmpty()) {
+            try {
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes( "C;" + jusernameTextField.getText() + ";" + jlist1.getSelectedValue() + "\n");
+
+            } catch (IOException ex) {
+                Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            jgametextArea.setText("Selecione um jogador antes de enviar menssagem!");
         }
     }
 
@@ -143,7 +191,6 @@ public class FrameClientMain extends JFrame{
         jFrame.setContentPane(jFrame.jallPanel);
         jFrame.setTitle("Jogo da velha");
         jFrame.setLocationRelativeTo(null);
-        jFrame.setVisible(true);
         jFrame.setSize(600, 400);
         jFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         jFrame.jdesconectarButton.setVisible(false);
@@ -151,5 +198,8 @@ public class FrameClientMain extends JFrame{
         jFrame.jgamePanel.setVisible(false);
         jFrame.jmsgPanel.setVisible(false);
         jFrame.jusersPanel.setVisible(false);
+        jFrame.juserListScrollPane.setViewportView(jFrame.jlist1);
+        jFrame.jmsgScrollPane.setViewportView(jFrame.jmsgTextArea);
+        jFrame.setVisible(true);
     }
 }

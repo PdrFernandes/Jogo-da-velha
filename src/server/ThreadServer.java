@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static server.Server.*;
+import static server.ServerMain.count;
 import static server.ServerMain.onlineClients;
 
 public class ThreadServer extends Thread{
@@ -44,9 +45,11 @@ public class ThreadServer extends Thread{
 
                 if (!loginList.isEmpty()  && !onlineClients.containsKey(name)) {
                     outputStream.writeBytes("E;1\n");
+                    System.out.println("E;1\n");
                     flag = false;
                 } else {
                     outputStream.writeBytes("E;0\n");
+                    System.out.println("E;0\n");
                 }
             }
 
@@ -69,7 +72,7 @@ public class ThreadServer extends Thread{
                         sendDisplayOnlineClients();
                         break;
                     case "C":
-                        playGame(msgFields);
+                        //playGame(msgFields);
                         break;
                     case "D":
                         disconnect();
@@ -121,10 +124,10 @@ public class ThreadServer extends Thread{
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("D\n");
 
-            this.socket.close();
-
             System.out.println("Disconnecting " + this.getName());
             System.out.println(onlineClients);
+
+            this.interrupt();
         } catch (IOException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
