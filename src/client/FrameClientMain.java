@@ -13,10 +13,6 @@ import java.util.logging.Logger;
 
 public class FrameClientMain extends JFrame{
 
-    static int port = 12345;
-    static String localHost = "127.0.0.1";
-    static boolean desconectou = false;
-    static boolean flag_login = true;
     String oponente;
     String player = "=";
     static Socket socket;
@@ -61,37 +57,37 @@ public class FrameClientMain extends JFrame{
         jconnectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buttonConectarPressed(e);
+                buttonConectarPressed();
             }
         });
         jdesconectarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buttonDesonectarPressed(e);
+                buttonDesonectarPressed();
             }
         });
         jloginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buttonLogarPressed(e);
+                buttonLogarPressed();
             }
         });
         jsendMsgButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buttonEnviarPressed(e);
+                buttonEnviarPressed();
             }
         });
         jrefreshOnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buttonAtualizarPressed(e);
+                buttonAtualizarPressed();
             }
         });
         jplayButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buttonJogarPressed(e);
+                buttonJogarPressed();
             }
         });
         jgame0Button.addActionListener(new ActionListener() {
@@ -99,69 +95,69 @@ public class FrameClientMain extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 jgame0Button.setName("0");
                 jgame0Button.setText(player);
-                gameButtonPressed(jgame0Button, e);
+                gameButtonPressed(jgame0Button);
             }
         });
         jgame1Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame1Button.setName("1");
-                gameButtonPressed(jgame1Button, e);
+                gameButtonPressed(jgame1Button);
             }
         });
         jgame2Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame2Button.setName("2");
-                gameButtonPressed(jgame2Button, e);
+                gameButtonPressed(jgame2Button);
             }
         });
         jgame3Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame3Button.setName("3");
-                gameButtonPressed(jgame3Button, e);
+                gameButtonPressed(jgame3Button);
             }
         });
         jgame4Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame4Button.setName("4");
-                gameButtonPressed(jgame4Button, e);
+                gameButtonPressed(jgame4Button);
             }
         });
         jgame5Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame5Button.setName("5");
-                gameButtonPressed(jgame5Button, e);
+                gameButtonPressed(jgame5Button);
             }
         });
         jgame6Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame6Button.setName("6");
-                gameButtonPressed(jgame6Button, e);
+                gameButtonPressed(jgame6Button);
             }
         });
         jgame7Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame7Button.setName("7");
-                gameButtonPressed(jgame7Button, e);
+                gameButtonPressed(jgame7Button);
             }
         });
         jgame8Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jgame8Button.setName("8");
-                gameButtonPressed(jgame8Button, e);
+                gameButtonPressed(jgame8Button);
             }
         });
     }
 
     //Comandos quando o botão conectar é pressionado
-    private void buttonConectarPressed (ActionEvent event) {
+    private void buttonConectarPressed () {
         try {
             socket = new Socket(jipTextField.getText(), Integer.parseInt(jportTextField.getText()));
 
@@ -180,7 +176,7 @@ public class FrameClientMain extends JFrame{
     }
 
     //Comandos quando o botão desconectar é pressionado
-    private void buttonDesonectarPressed (ActionEvent event) {
+    private void buttonDesonectarPressed () {
 
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -192,7 +188,7 @@ public class FrameClientMain extends JFrame{
     }
 
     //Comandos quando o botão logar é pressionado
-    private void buttonLogarPressed(ActionEvent event){
+    private void buttonLogarPressed(){
 
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -206,7 +202,7 @@ public class FrameClientMain extends JFrame{
     }
 
     //Comandos quando o botão enviar é pressionado
-    private void buttonEnviarPressed(ActionEvent event){
+    private void buttonEnviarPressed(){
         if (!jlist1.isSelectionEmpty()) {
             try {
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -222,7 +218,7 @@ public class FrameClientMain extends JFrame{
     }
 
     //Comandos quando o botão atualizar é pressionado
-    private void buttonAtualizarPressed(ActionEvent event){
+    private void buttonAtualizarPressed(){
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes( "B\n");
@@ -233,7 +229,7 @@ public class FrameClientMain extends JFrame{
     }
 
     //Comandos quando o botão jogar é pressionado
-    private void buttonJogarPressed(ActionEvent event){
+    private void buttonJogarPressed(){
         if (!jlist1.isSelectionEmpty()) {
             try {
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -247,7 +243,7 @@ public class FrameClientMain extends JFrame{
         }
     }
 
-    private void gameButtonPressed(JButton gameButton, ActionEvent event){
+    private void gameButtonPressed(JButton gameButton){
         String botao = gameButton.getName();
         gameButton.setText(player);
         gameButton.setEnabled(false);

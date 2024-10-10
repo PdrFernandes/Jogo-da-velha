@@ -15,37 +15,27 @@ public class ClientThread extends Thread{
     String msg = "";
     boolean isPlaying = false;
     boolean flag = true;
-    private FrameClientMain frameClientMain;
 
-    private JPanel jallPanel;
-    private JPanel jconnectionPanel;
-    private JPanel jmsgPanel;
-    private JPanel juserDataPanel;
-    private JPanel jusersPanel;
-    private JPanel jgamePanel;
-    private JTextField jipTextField;
-    private JTextField jportTextField;
-    private JButton jconnectButton;
-    private JButton jdesconectarButton;
-    private JPasswordField jpasswordField;
-    private JTextField jusernameTextField;
-    private JButton jloginButton;
-    private JTextArea jmsgTextArea;
-    private JTextField jsendMsgTextField;
-    private JButton jsendMsgButton;
-    private JList<String> jList;
+    private final FrameClientMain frameClientMain;
 
-    private JTextArea jgametextArea;
-    private JButton jplayButton;
-    private JButton jgame4Button;
-    private JButton jgame5Button;
-    private JButton jgame6Button;
-    private JButton jgame1Button;
-    private JButton jgame2Button;
-    private JButton jgame3Button;
-    private JButton jgame7Button;
-    private JButton jgame8Button;
-    private JButton jgame9Button;
+    private final JPanel jconnectionPanel;
+    private final JPanel jmsgPanel;
+    private final JPanel juserDataPanel;
+    private final JPanel jusersPanel;
+    private final JPanel jgamePanel;
+    private final JTextField jipTextField;
+    private final JTextField jportTextField;
+    private final JButton jconnectButton;
+    private final JButton jdesconectarButton;
+    private final JPasswordField jpasswordField;
+    private final JTextField jusernameTextField;
+    private final JButton jloginButton;
+    private final JTextArea jmsgTextArea;
+    private final JTextField jsendMsgTextField;
+    private final JList<String> jList;
+
+    private final JTextArea jgametextArea;
+    private final JButton jplayButton;
 
     //O construtor recebe os elementos do JFrame para poder editar eles
     public ClientThread(Socket socket, FrameClientMain frameClientMain, JPanel jconnectionPanel,JTextField jipTextField, JTextField jportTextField, JButton jconnectButton,
@@ -169,8 +159,6 @@ public class ClientThread extends Thread{
             frameClientMain.desativarGameButtons();
             jgametextArea.setText("Aguardando o oponente jogar! ");
         }
-
-        //recordPlay(msgFields);
     }
 
     //Chamada caso um erro ocorra ao jogar contra outro jogador
@@ -207,7 +195,7 @@ public class ClientThread extends Thread{
 
         } else if (Objects.equals(msgFields[2], "1")){
 
-            frameClientMain.atualizarTextoGameButton(msgFields[4], msgFields[5]);
+            frameClientMain.atualizarTextoGameButton(msgFields[3], msgFields[4]);
             frameClientMain.ativarGameButtons();
             jgametextArea.setText("Sua vez de jogar! ");
 
@@ -262,6 +250,5 @@ public class ClientThread extends Thread{
 
         flag = false;
         socket.close();
-        interrupt();
     }
 }
