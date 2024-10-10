@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static server.Server.*;
-import static server.ServerMain.count;
 import static server.ServerMain.onlineClients;
 
 public class ThreadServer extends Thread{
@@ -16,6 +15,8 @@ public class ThreadServer extends Thread{
     Socket socket;
     boolean flag = true;
     String msg = "";
+    String[] tabuleiro;
+    boolean isplaying = false;
 
     public ThreadServer (Socket socket){
         this.socket = socket;
@@ -72,7 +73,8 @@ public class ThreadServer extends Thread{
                         sendDisplayOnlineClients();
                         break;
                     case "C":
-                        //playGame(msgFields);
+                        if (Objects.equals(msgFields[1], "1")) playGame(msgFields);
+                        else sendMoveGame(msgFields);
                         break;
                     case "D":
                         disconnect();
@@ -127,17 +129,103 @@ public class ThreadServer extends Thread{
             System.out.println("Disconnecting " + this.getName());
             System.out.println(onlineClients);
 
-            this.interrupt();
+
         } catch (IOException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void playGame(String[] msgFields){
-        if (onlineClients.get(msgFields[2]) != null){
-            GameHandler gameHandler = new GameHandler(this.socket, onlineClients.get(msgFields[2]));
-            gameHandler.innit();
+        if (onlineClients.get(msgFields[3]) != null){
+            try {
+                isplaying = true;
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes("C;0;1;" + msgFields[3] + ";" + "X" + "\n");
+
+                Thread.sleep(500);
+
+                outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
+                outputStream.writeBytes("C;0;0;" + msgFields[2] + ";" + "O" + "\n");
+
+                tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            try {
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
+            } catch (IOException ex) {
+                Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+    }
+
+    private void sendMoveGame(String[] msgFields) {
+        if (!isplaying) {
+            tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+            isplaying = true;
+        }
+        tabuleiro[Integer.parseInt(msgFields[4])] = msgFields[5];
+
+        if (checkWinner(msgFields[5])){
+            //outputStream.writeBytes( "C;0;" + jusernameTextField.getText() + ";" + oponente + ";" + botao + ";" + player + "\n");
+            try {
+                System.out.println("Winner");
+                ///////JOGADOR Q ACABOU DE JOGAR GANHOU
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
+            } catch (IOException ex) {
+                Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (isBoardFull()){
+            try {
+                System.out.println("Draw");
+                /////EMPATE
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
+
+                outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
+                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
+            } catch (IOException ex) {
+                Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            try {
+                System.out.println("Adversário");
+                /////ENVIA JOGADA PRO ADVERSÀRIO
+                DataOutputStream outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
+                                                     //nome p qm vai      jogada (botão)         X ou O
+                outputStream.writeBytes("C;0;1;" + msgFields[3] + ";" + msgFields[4] + ";" + msgFields[5] + "\n");
+            } catch (IOException ex) {
+                Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private boolean isBoardFull() {
+        for (String c : tabuleiro) {
+            if (Objects.equals(c, "-")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean checkWinner(String currentPlayer) {
+        int[][] winningPositions = {
+                {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Linhas
+                {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Colunas
+                {0, 4, 8}, {2, 4, 6}             // Diagonais
+        };
+
+        for (int[] wp : winningPositions) {
+            if (Objects.equals(tabuleiro[wp[0]], currentPlayer) && Objects.equals(tabuleiro[wp[1]], currentPlayer) && Objects.equals(tabuleiro[wp[2]], currentPlayer)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

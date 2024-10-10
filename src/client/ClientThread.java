@@ -7,16 +7,17 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.Semaphore;
 import java.util.logging.*;
 
 import static client.ClientMain.flag;
-import static client.ClientMain.flag_login;
 
 // Cuida das menssagens a serem recebidas do servidor
 public class ClientThread extends Thread{
     Socket socket;
     String msg = "";
+    boolean isPlaying = false;
+
+    String[] tabuleiro;
 
     private FrameClientMain frameClientMain;
 
@@ -38,10 +39,23 @@ public class ClientThread extends Thread{
     private JButton jsendMsgButton;
     private JList<String> jList;
 
+    private JTextArea jgametextArea;
+    private JButton jplayButton;
+    private JButton jgame4Button;
+    private JButton jgame5Button;
+    private JButton jgame6Button;
+    private JButton jgame1Button;
+    private JButton jgame2Button;
+    private JButton jgame3Button;
+    private JButton jgame7Button;
+    private JButton jgame8Button;
+    private JButton jgame9Button;
+
     //O construtor recebe os elementos do JFrame para poder editar eles
     public ClientThread(Socket socket, FrameClientMain frameClientMain, JPanel jconnectionPanel,JTextField jipTextField, JTextField jportTextField, JButton jconnectButton,
                         JPanel juserDataPanel ,JButton jloginButton, JTextField jusernameTextField, JPasswordField jpasswordField, JButton jdesconectarButton,
-                        JList<String> jList, JPanel jusersPanel, JPanel jgamePanel, JPanel jmsgPanel, JTextArea jmsgTextArea, JTextField jsendMsgTextField) {
+                        JList<String> jList, JPanel jusersPanel, JPanel jgamePanel, JPanel jmsgPanel, JTextArea jmsgTextArea, JTextField jsendMsgTextField,
+                        JTextArea jgametextArea, JButton jplayButton) {
         this.socket = socket;
         this.frameClientMain = frameClientMain;
         this.jconnectionPanel = jconnectionPanel;
@@ -59,6 +73,9 @@ public class ClientThread extends Thread{
         this.jmsgPanel = jmsgPanel;
         this.jmsgTextArea = jmsgTextArea;
         this.jsendMsgTextField = jsendMsgTextField;
+        this.jgametextArea = jgametextArea;
+        this.jplayButton = jplayButton;
+
     }
 
     @Override
@@ -70,12 +87,15 @@ public class ClientThread extends Thread{
                 msg = bufferedReader.readLine();
                 String[] msgFields;
 
+
                 if (msg != null) {
                     msgFields = msg.split(";");
                 } else {
                     msgFields = new String[1];
                     msgFields[0] = "D";
                 }
+
+                System.out.println(Arrays.toString(msgFields));
 
                 switch (msgFields[0]) {
                     case "A":
@@ -86,7 +106,19 @@ public class ClientThread extends Thread{
                         displayOnlineClients(msgFields);
                         break;
                     case "C":
-                        break;
+                        if (isPlaying) {
+                            System.out.println("recebi jogada");
+                            recordPlay(msgFields);
+                            break;
+                        }
+                        else if (Objects.equals(msgFields[1], "1")) {
+                            refusedPalyGame(msgFields);
+                            break;
+                        }
+                        else {
+                            acceptPlayGame(msgFields);
+                            break;
+                        }
                     case "D":
                         desconectar();
                         return;
@@ -107,7 +139,7 @@ public class ClientThread extends Thread{
 
     private void displayMsgFromClient(String[] msgField){
         String msg = "Mensagem de " + msgField[1] + " :>" + msgField[3];
-        jmsgTextArea.append(msg);
+        jmsgTextArea.append(msg + "\n");
         jmsgTextArea.setCaretPosition(jmsgTextArea.getDocument().getLength() - 1);
     }
 
@@ -122,6 +154,37 @@ public class ClientThread extends Thread{
 
         for(String usuario: usuariosOnline){
             model.addElement(usuario);
+        }
+    }
+
+    private void acceptPlayGame(String[] msgFields){
+        isPlaying = true;
+        frameClientMain.oponente = msgFields[3];
+        frameClientMain.player = msgFields[4];
+        jplayButton.setEnabled(false);
+        tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+        jgametextArea.setText("Você está jogando contra: " + msgFields[3]);
+        recordPlay(msgFields);
+    }
+
+    private void refusedPalyGame(String[] msgFields){
+        jgametextArea.setText("Não foi possivel jogar contra " + msgFields[2] + " O jogador não está mais online");
+    }
+
+    private void recordPlay(String[] msgFields){
+        if (Objects.equals(msgFields[1], "1")) {
+            jgametextArea.setText("Parabens, Você ganhou!!!!!!");
+            isPlaying = false;
+        }
+        else if (Objects.equals(msgFields[1], "2")){
+            jgametextArea.setText("Empate");
+        } else if (Objects.equals(msgFields[2], "1")){
+
+            frameClientMain.ativarGameButtons();
+            jgametextArea.setText("Sua vez de jogar! ");
+        } else {
+            frameClientMain.desativarGameButtons();
+            jgametextArea.setText("Aguardando o oponente jogar! ");
         }
     }
 

@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,10 +17,10 @@ public class FrameClientMain extends JFrame{
     static String localHost = "127.0.0.1";
     static boolean desconectou = false;
     static boolean flag_login = true;
-    static String name;
+    String oponente;
+    String player = "=";
     static Socket socket;
     ClientThread clientThread;
-    static boolean isPlaying = false;
 
     private static FrameClientMain jFrame;
 
@@ -44,15 +45,15 @@ public class FrameClientMain extends JFrame{
     private JScrollPane juserListScrollPane;
     private JScrollPane jmsgScrollPane;
     private JTextArea jgametextArea;
+    private JButton jgame3Button;
     private JButton jgame4Button;
     private JButton jgame5Button;
-    private JButton jgame6Button;
+    private JButton jgame0Button;
     private JButton jgame1Button;
     private JButton jgame2Button;
-    private JButton jgame3Button;
+    private JButton jgame6Button;
     private JButton jgame7Button;
     private JButton jgame8Button;
-    private JButton jgame9Button;
     private JButton jplayButton;
 
 
@@ -93,6 +94,70 @@ public class FrameClientMain extends JFrame{
                 buttonJogarPressed(e);
             }
         });
+        jgame0Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame0Button.setName("0");
+                jgame0Button.setText(player);
+                gameButtonPressed(jgame0Button, e);
+            }
+        });
+        jgame1Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame1Button.setName("1");
+                gameButtonPressed(jgame1Button, e);
+            }
+        });
+        jgame2Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame2Button.setName("2");
+                gameButtonPressed(jgame2Button, e);
+            }
+        });
+        jgame3Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame3Button.setName("3");
+                gameButtonPressed(jgame3Button, e);
+            }
+        });
+        jgame4Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame4Button.setName("4");
+                gameButtonPressed(jgame4Button, e);
+            }
+        });
+        jgame5Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame5Button.setName("5");
+                gameButtonPressed(jgame5Button, e);
+            }
+        });
+        jgame6Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame6Button.setName("6");
+                gameButtonPressed(jgame6Button, e);
+            }
+        });
+        jgame7Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame7Button.setName("7");
+                gameButtonPressed(jgame7Button, e);
+            }
+        });
+        jgame8Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jgame8Button.setName("8");
+                gameButtonPressed(jgame8Button, e);
+            }
+        });
     }
 
     //Comandos quando o botão conectar é pressionado
@@ -101,7 +166,8 @@ public class FrameClientMain extends JFrame{
             socket = new Socket(jipTextField.getText(), Integer.parseInt(jportTextField.getText()));
 
             clientThread = new ClientThread(socket, jFrame, jconnectionPanel, jipTextField, jportTextField, jconnectButton,
-                    juserDataPanel, jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1, jusersPanel, jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField);
+                    juserDataPanel, jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1, jusersPanel,
+                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jgametextArea, jplayButton);
 
             clientThread.start();
 
@@ -150,7 +216,7 @@ public class FrameClientMain extends JFrame{
                 Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            jmsgTextArea.append("Selecione um jogador antes de enviar menssagem!");
+            jmsgTextArea.append("Selecione um jogador antes de enviar menssagem!\n");
             jmsgTextArea.setCaretPosition(jmsgTextArea.getDocument().getLength() - 1);
         }
     }
@@ -166,11 +232,12 @@ public class FrameClientMain extends JFrame{
         }
     }
 
+    //Comandos quando o botão jogar é pressionado
     private void buttonJogarPressed(ActionEvent event){
         if (!jlist1.isSelectionEmpty()) {
             try {
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                outputStream.writeBytes( "C;" + jusernameTextField.getText() + ";" + jlist1.getSelectedValue() + "\n");
+                outputStream.writeBytes( "C;1;" + jusernameTextField.getText() + ";" + jlist1.getSelectedValue() + "\n");
 
             } catch (IOException ex) {
                 Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
@@ -180,10 +247,53 @@ public class FrameClientMain extends JFrame{
         }
     }
 
+    private void gameButtonPressed(JButton gameButton, ActionEvent event){
+        String botao = gameButton.getName();
+        gameButton.setText(player);
+        gameButton.setEnabled(false);
+
+        try {
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeBytes( "C;0;" + jusernameTextField.getText() + ";" + oponente + ";" + botao + ";" + player + "\n");
+            desativarGameButtons();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }
+
     //Desabilitando algum TextField
     public void desabilitarTextField(JTextField jTextField) {
         jTextField.setEditable(false);
         jTextField.setBackground(Color.GRAY);
+    }
+
+    //Desativa os botoes de jogo
+    public void desativarGameButtons(){
+        jgame0Button.setEnabled(false);
+        jgame1Button.setEnabled(false);
+        jgame2Button.setEnabled(false);
+        jgame3Button.setEnabled(false);
+        jgame4Button.setEnabled(false);
+        jgame5Button.setEnabled(false);
+        jgame6Button.setEnabled(false);
+        jgame7Button.setEnabled(false);
+        jgame8Button.setEnabled(false);
+    }
+
+    //Ativa os botoes de jogo
+    public void ativarGameButtons(){
+        if (Objects.equals(jgame0Button.getText(), "-")) jgame0Button.setEnabled(true);
+        if (Objects.equals(jgame1Button.getText(), "-")) jgame1Button.setEnabled(true);
+        if (Objects.equals(jgame2Button.getText(), "-")) jgame2Button.setEnabled(true);
+        if (Objects.equals(jgame3Button.getText(), "-")) jgame3Button.setEnabled(true);
+        if (Objects.equals(jgame4Button.getText(), "-")) jgame4Button.setEnabled(true);
+        if (Objects.equals(jgame5Button.getText(), "-")) jgame5Button.setEnabled(true);
+        if (Objects.equals(jgame6Button.getText(), "-")) jgame6Button.setEnabled(true);
+        if (Objects.equals(jgame7Button.getText(), "-")) jgame7Button.setEnabled(true);
+        if (Objects.equals(jgame8Button.getText(), "-")) jgame8Button.setEnabled(true);
     }
 
     public static void main(String[] args) {
