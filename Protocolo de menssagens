@@ -1,8 +1,89 @@
 O protocolo de mensagens é definido pelos 8 primeiros bits ou primeiro byte que são envidaso, eles estão
 definidos como uma letra em maiusculo, em seguida seus campos são divididos pelo caractere ";" e variam
-conforme a mensagem tendo um tamanho maximo de (a definir, provavel 32) bytes e é finalizada po "\n",
+conforme a mensagem e sentido (cliente -> servidor ou servidor -> cliente) e é finalizada por "\n",
 pois para ler está sendo utilizado o metodo readLine. (podia definir o primeiro campo e depois disso os
 bytes eram dividos automaticamente sem precisar de separador e só os numero do byte mas como da mais trabalho fiz assim)
+Existe a mensagem de login que foge do protoclo inicial, ela envia o nome de usuario e senha para o servidor
 
-Messsagem entre usuarios: (TCP, não se pode perder a msg)
-    A;Cliente de origem;Cliente de destino;Menssagem
+Protocolo cliente -> servidor:
+
+    Mensagem de Login:
+        São duas mensagens:
+        nome\n
+
+        senha\n
+
+    Enviar mensagem para outro jogador (codigo A):
+        A;nome do remetente;nome do destinatario;texto da mensagem\n
+
+    Atualizar lista de jogadores online (codigo B):
+        B\n
+
+    Jogar contra outro jogador (codigo C):
+        Mesnagem para jogar contra alguem:
+            C;1;jogador desafiante;jogador desafiado\n
+
+        Mensagem para fazer uma jogada:
+            C;0;jogador que fez jogada;oponente;qual foi a jogada;simbolo do jogador\n
+            qual foi a jogada: valor de 0 a 8 indicando o botão que foi jogado
+            simbolo do jogador: "X" ou "O"
+
+    Mensagem de desconectar (codigo D):
+    D\n
+
+Protocolo servidor -> cliente:
+
+    Enviar mensagem para outro jogador (codigo A):
+        A;nome do remetente;nome do destinatario;texto da mensagem\n
+
+    Enviar clientes online (codigo B):
+        B;cliente 1;cliente 2; ..... cliente i\n
+
+    Enviar dados do jogo (codigo C):
+        Se é um novo jogo:
+            Se o jogador desafiado pode jogar:
+                Envia duas mensagens, uma pra cada jogador do duelo:
+                    para jogador que desafiou:
+                    C;0;1;Jogador desafiado;X\n
+
+                    para jogador desafiado:
+                    C;0;0;Jogador que desafiou;O\n
+
+            Se o jogador desafiado não pode jogar:
+                porque ele já está jogando:
+                    C;1;1;jogador desafiado\n
+
+                porque ele está ofline:
+                    C;1;0;jogador desafiado\n
+
+        Se não é um novo jogo, é uma jogada:
+            Se o jogador que acabou de jogar ganhou:
+                 Envia duas mensagens, uma pra cada jogador do duelo:
+                    para jogador que acabou de jogar (ganhador):
+                    C;1;1;jogador que perdeu\n
+
+                    para o outro jogador (perdedor):
+                    C;1;0;jogador que ganhou\n
+
+            Se deu empate:
+                Envia duas mensagens, uma pra cada jogador do duelo:
+                    para jogador que acabou de jogar :
+                    C;2\n
+
+                    para o outro jogador:
+                    C;2\n
+
+            Se é uma jogada no "tabuleiro":
+                Envia para o oponente:
+                    C;0;1;local da jogada;simbolo de quem jogou\n
+
+    Desconectar (Codigo D):
+        D\n
+
+
+    Mensagem de Login(Codigo E):
+        Se o login deu certo:
+            E;1\n
+
+        Se o login deu errado:
+            E;O\n
