@@ -283,7 +283,7 @@ public class FrameClientMain extends JFrame{
         jgame8Button.setEnabled(false);
     }
 
-    //Ativa os botoes de jogo
+    //Ativa os botoes de jogo que ainda não foram pressionados
     public void ativarGameButtons(){
         if (Objects.equals(jgame0Button.getText(), "-")) jgame0Button.setEnabled(true);
         if (Objects.equals(jgame1Button.getText(), "-")) jgame1Button.setEnabled(true);
@@ -294,6 +294,63 @@ public class FrameClientMain extends JFrame{
         if (Objects.equals(jgame6Button.getText(), "-")) jgame6Button.setEnabled(true);
         if (Objects.equals(jgame7Button.getText(), "-")) jgame7Button.setEnabled(true);
         if (Objects.equals(jgame8Button.getText(), "-")) jgame8Button.setEnabled(true);
+    }
+
+    //Reseta os botoes de jogo para o texto "-"
+    public void resetGameButtons(){
+        jgame0Button.setText("-");
+        jgame1Button.setText("-");
+        jgame2Button.setText("-");
+        jgame3Button.setText("-");
+        jgame4Button.setText("-");
+        jgame5Button.setText("-");
+        jgame6Button.setText("-");
+        jgame7Button.setText("-");
+        jgame8Button.setText("-");
+    }
+
+    //Atualiza o texto do botão que foi passado como String para o texto que foi passado,
+    // botao ("0" , "1" .... "8") player ("X" ou "O")
+    public void atualizarTextoGameButton(String botao, String player){
+
+        switch (botao) {
+            case "0":
+                jgame0Button.setEnabled(false);
+                jgame0Button.setText(player);
+                break;
+            case "1":
+                jgame1Button.setEnabled(false);
+                jgame1Button.setText(player);
+                break;
+            case "2":
+                jgame2Button.setEnabled(false);
+                jgame2Button.setText(player);
+                break;
+            case "3":
+                jgame3Button.setEnabled(false);
+                jgame3Button.setText(player);
+                break;
+            case "4":
+                jgame4Button.setEnabled(false);
+                jgame4Button.setText(player);
+                break;
+            case "5":
+                jgame5Button.setEnabled(false);
+                jgame5Button.setText(player);
+                break;
+            case "6":
+                jgame6Button.setEnabled(false);
+                jgame6Button.setText(player);
+                break;
+            case "7":
+                jgame7Button.setEnabled(false);
+                jgame7Button.setText(player);
+                break;
+            case "8":
+                jgame8Button.setEnabled(false);
+                jgame8Button.setText(player);
+                break;
+        }
     }
 
     public static void main(String[] args) {

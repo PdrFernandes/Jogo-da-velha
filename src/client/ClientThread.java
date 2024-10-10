@@ -17,8 +17,6 @@ public class ClientThread extends Thread{
     String msg = "";
     boolean isPlaying = false;
 
-    String[] tabuleiro;
-
     private FrameClientMain frameClientMain;
 
     private JPanel jallPanel;
@@ -157,32 +155,66 @@ public class ClientThread extends Thread{
         }
     }
 
+    //Chamada quando outro jogador deseja jogar contra, como um handshake,
+    //para definir as variaveis nescessárias
     private void acceptPlayGame(String[] msgFields){
         isPlaying = true;
         frameClientMain.oponente = msgFields[3];
         frameClientMain.player = msgFields[4];
         jplayButton.setEnabled(false);
-        tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
         jgametextArea.setText("Você está jogando contra: " + msgFields[3]);
-        recordPlay(msgFields);
-    }
 
-    private void refusedPalyGame(String[] msgFields){
-        jgametextArea.setText("Não foi possivel jogar contra " + msgFields[2] + " O jogador não está mais online");
-    }
-
-    private void recordPlay(String[] msgFields){
-        if (Objects.equals(msgFields[1], "1")) {
-            jgametextArea.setText("Parabens, Você ganhou!!!!!!");
-            isPlaying = false;
-        }
-        else if (Objects.equals(msgFields[1], "2")){
-            jgametextArea.setText("Empate");
-        } else if (Objects.equals(msgFields[2], "1")){
-
+        if (Objects.equals(msgFields[2], "1")){
             frameClientMain.ativarGameButtons();
             jgametextArea.setText("Sua vez de jogar! ");
         } else {
+            frameClientMain.desativarGameButtons();
+            jgametextArea.setText("Aguardando o oponente jogar! ");
+        }
+
+        //recordPlay(msgFields);
+    }
+
+    //Chamada caso um erro ocorra ao jogar contra outro jogador
+    // ou ele está ofline, ou já está jogando
+    private void refusedPalyGame(String[] msgFields){
+        if (Objects.equals(msgFields[2], "1")){
+            jgametextArea.setText("Não foi possivel jogar contra " + msgFields[3] + " O jogador já está jogando");
+        } else {
+            jgametextArea.setText("Não foi possivel jogar contra " + msgFields[3] + " O jogador não está mais online");
+        }
+    }
+
+    //Chamada para registrar a jogada ou resultado do jogo
+    private void recordPlay(String[] msgFields){
+        if (Objects.equals(msgFields[1], "1")) {
+
+            if (Objects.equals(msgFields[2], "1")){
+                jgametextArea.setText("Parabens, Você ganhou!!!!!!");
+            } else {
+                jgametextArea.setText("Voce perdeu para o jogador " + msgFields[3]);
+            }
+            isPlaying = false;
+            frameClientMain.resetGameButtons();
+            frameClientMain.desativarGameButtons();
+            jplayButton.setEnabled(true);
+
+        }
+        else if (Objects.equals(msgFields[1], "2")){
+
+            jgametextArea.setText("O jogo empatou!");
+            isPlaying = false;
+            frameClientMain.resetGameButtons();
+            jplayButton.setEnabled(true);
+
+        } else if (Objects.equals(msgFields[2], "1")){
+
+            frameClientMain.atualizarTextoGameButton(msgFields[4], msgFields[5]);
+            frameClientMain.ativarGameButtons();
+            jgametextArea.setText("Sua vez de jogar! ");
+
+        } else {
+
             frameClientMain.desativarGameButtons();
             jgametextArea.setText("Aguardando o oponente jogar! ");
         }
@@ -204,9 +236,11 @@ public class ClientThread extends Thread{
             this.setName(jusernameTextField.getText());
             System.out.println("Voce realizou o login com sucesso!");
         } else {
+
             jloginButton.setVisible(true);
             jusernameTextField.setText("Usuario e/ou senha errados. Tente novamente");
             System.out.println("Usuario e/ou senha errados");
+
         }
     }
 

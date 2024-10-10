@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 
 import static server.Server.*;
 import static server.ServerMain.onlineClients;
+import static server.ServerMain.threadsOline;
 
 public class ThreadServer extends Thread{
-    //private static HashMap<String, Socket> othersOnlineClients = new HashMap<>();
     Socket socket;
     boolean flag = true;
     String msg = "";
@@ -57,6 +57,7 @@ public class ThreadServer extends Thread{
             flag = true;
             this.setName(name);
             onlineClients.put(name, socket);
+            threadsOline.put(name, this);
             sendDisplayOnlineClients();
 
             while (flag) {
@@ -122,6 +123,7 @@ public class ThreadServer extends Thread{
     private void disconnect() {
         try {
             onlineClients.remove(this.getName());
+            threadsOline.remove(this.getName());
 
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("D\n");
@@ -136,25 +138,38 @@ public class ThreadServer extends Thread{
     }
 
     private void playGame(String[] msgFields){
-        if (onlineClients.get(msgFields[3]) != null){
+        if (onlineClients.get(msgFields[3]) != null && !isplaying){
             try {
-                isplaying = true;
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes("C;0;1;" + msgFields[3] + ";" + "X" + "\n");
 
-                Thread.sleep(500);
+                Thread.sleep(100);
 
                 outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
                 outputStream.writeBytes("C;0;0;" + msgFields[2] + ";" + "O" + "\n");
 
+                for (ThreadServer t : threadsOline.values()) {
+                    if (t.getName().equals(msgFields[3])) {
+                        t.isplaying = true;
+                        t.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+                    }
+                }
+
+                isplaying = true;
                 tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+
             } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             try {
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
+                if (isplaying) {
+                    DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                    outputStream.writeBytes("C;1;1;" + msgFields[3] + "\n");
+                } else {
+                    DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                    outputStream.writeBytes("C;1;0;" + msgFields[3] + "\n");
+                }
             } catch (IOException ex) {
                 Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -162,41 +177,66 @@ public class ThreadServer extends Thread{
     }
 
     private void sendMoveGame(String[] msgFields) {
-        if (!isplaying) {
-            tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
-            isplaying = true;
-        }
+//        if (!isplaying) {
+//            tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+//            isplaying = true;
+//        }
         tabuleiro[Integer.parseInt(msgFields[4])] = msgFields[5];
+
+        System.out.println(Arrays.toString(tabuleiro));
 
         if (checkWinner(msgFields[5])){
             //outputStream.writeBytes( "C;0;" + jusernameTextField.getText() + ";" + oponente + ";" + botao + ";" + player + "\n");
             try {
                 System.out.println("Winner");
-                ///////JOGADOR Q ACABOU DE JOGAR GANHOU
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
-            } catch (IOException ex) {
+                outputStream.writeBytes("C;1;1;" + msgFields[3] + "\n");
+
+                Thread.sleep(100);
+
+                outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
+                outputStream.writeBytes("C;1;0;" + msgFields[2] + "\n");
+
+                for (ThreadServer t : threadsOline.values()) {
+                    if (t.getName().equals(msgFields[3])) {
+                        t.isplaying = false;
+                        t.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+                    }
+                }
+
+                tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+                isplaying = false;
+            } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        if (isBoardFull()){
+        else if (isBoardFull()){
             try {
                 System.out.println("Draw");
-                /////EMPATE
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
+                outputStream.writeBytes("C;2;" + msgFields[3] + "\n");
+
+                Thread.sleep(100);
 
                 outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
-                outputStream.writeBytes("C;1;" + msgFields[3] + "\n");
-            } catch (IOException ex) {
+                outputStream.writeBytes("C;2;" + msgFields[3] + "\n");
+
+                for (ThreadServer t : threadsOline.values()) {
+                    if (t.getName().equals(msgFields[3])) {
+                        t.isplaying = false;
+                        t.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+                    }
+                }
+
+                tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
+                isplaying = false;
+            } catch (IOException | InterruptedException ex) {
                 Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             try {
                 System.out.println("Adversário");
-                /////ENVIA JOGADA PRO ADVERSÀRIO
                 DataOutputStream outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
-                                                     //nome p qm vai      jogada (botão)         X ou O
                 outputStream.writeBytes("C;0;1;" + msgFields[3] + ";" + msgFields[4] + ";" + msgFields[5] + "\n");
             } catch (IOException ex) {
                 Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -205,12 +245,10 @@ public class ThreadServer extends Thread{
     }
 
     private boolean isBoardFull() {
-        for (String c : tabuleiro) {
-            if (Objects.equals(c, "-")) {
-                return false;
-            }
-        }
-        return true;
+        String[] resultado = Arrays.stream(tabuleiro).filter(s -> !s.equals("-")).toArray(String[]::new);
+        System.out.println("check:" + Arrays.toString(resultado));
+
+        return resultado.length > 4;
     }
 
     private boolean checkWinner(String currentPlayer) {
