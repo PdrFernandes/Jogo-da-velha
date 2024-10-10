@@ -9,14 +9,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.*;
 
-import static client.ClientMain.flag;
-
 // Cuida das menssagens a serem recebidas do servidor
 public class ClientThread extends Thread{
     Socket socket;
     String msg = "";
     boolean isPlaying = false;
-
+    boolean flag = true;
     private FrameClientMain frameClientMain;
 
     private JPanel jallPanel;
