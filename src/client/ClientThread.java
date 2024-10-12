@@ -30,6 +30,7 @@ public class ClientThread extends Thread{
     private final JPasswordField jpasswordField;
     private final JTextField jusernameTextField;
     private final JButton jloginButton;
+    private final JButton jCriarButton;
     private final JTextArea jmsgTextArea;
     private final JTextField jsendMsgTextField;
     private final JList<String> jList;
@@ -41,7 +42,7 @@ public class ClientThread extends Thread{
     public ClientThread(Socket socket, FrameClientMain frameClientMain, JPanel jconnectionPanel,JTextField jipTextField, JTextField jportTextField, JButton jconnectButton,
                         JPanel juserDataPanel ,JButton jloginButton, JTextField jusernameTextField, JPasswordField jpasswordField, JButton jdesconectarButton,
                         JList<String> jList, JPanel jusersPanel, JPanel jgamePanel, JPanel jmsgPanel, JTextArea jmsgTextArea, JTextField jsendMsgTextField,
-                        JTextArea jgametextArea, JButton jplayButton) {
+                        JTextArea jgametextArea, JButton jplayButton, JButton jCriarButton) {
         this.socket = socket;
         this.frameClientMain = frameClientMain;
         this.jconnectionPanel = jconnectionPanel;
@@ -50,6 +51,7 @@ public class ClientThread extends Thread{
         this.jconnectButton = jconnectButton;
         this.juserDataPanel = juserDataPanel;
         this.jloginButton = jloginButton;
+        this.jCriarButton = jCriarButton;
         this.jusernameTextField = jusernameTextField;
         this.jpasswordField = jpasswordField;
         this.jdesconectarButton = jdesconectarButton;
@@ -111,9 +113,11 @@ public class ClientThread extends Thread{
                     case "E":
                         loginMsg(msgFields);
                         break;
+                    case "F":
+                        criarMsg(msgFields);
+                        break;
                     default:
                         System.out.println(msg);
-                        break;
                 }
 
             }
@@ -203,6 +207,13 @@ public class ClientThread extends Thread{
 
             frameClientMain.desativarGameButtons();
             jgametextArea.setText("Aguardando o oponente jogar! ");
+        }
+    }
+
+    private void criarMsg(String[] msgField){
+        if (Objects.equals(msgField[1], "0")) {
+            jCriarButton.setVisible(true);
+            jusernameTextField.setText("Este usuário já está em uso. Tente novamente!");
         }
     }
 

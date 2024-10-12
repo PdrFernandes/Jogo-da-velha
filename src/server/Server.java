@@ -119,7 +119,47 @@ public class Server {
         
         return resultList;
     }
-    
+
+    /*BUSCA USUÁRIO POR USERNAME LITERAL
+     * PARÂMETROS:
+     * - username: username do usuário (OBRIGATÓRIO)
+     * RETORNO: ResultSet
+     * */
+    public static List<Map<String, Object>> sel_usuario_username_literal(String username) throws SQLException {
+        ResultSet rs = null;
+        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+
+        //Tenta estabelecer a conexão
+        try (Connection con = DriverManager.getConnection(Server.connectionUrl);) {
+            CallableStatement call = con.prepareCall("{ call sel_usuario_username_lit(?) }");
+            //Define os parâmetros (precisam ser definidos em ordem, ver procedure para saber a ordem)
+            call.setString(1, username);
+
+            //Executa a procedure
+            call.execute();
+
+            rs = call.getResultSet();
+
+            Map<String, Object> row = null;
+
+            ResultSetMetaData metaData = rs.getMetaData();
+            Integer columnCount = metaData.getColumnCount();
+
+            while (rs.next()) {
+                row = new HashMap<String, Object>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.put(metaData.getColumnName(i), rs.getObject(i));
+                }
+                resultList.add(row);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resultList;
+    }
+
     /*BUSCA USUÁRIO POR USERNAME
      * PARÂMETROS: 
      * - username: username do usuário (NÃO OBRIGATÓRIO)

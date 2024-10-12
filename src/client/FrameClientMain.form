@@ -316,9 +316,17 @@
             </constraints>
             <properties/>
           </component>
+          <component id="3d45f" class="javax.swing.JButton" binding="jCriarButton">
+            <constraints>
+              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Criar"/>
+            </properties>
+          </component>
           <component id="80849" class="javax.swing.JButton" binding="jloginButton">
             <constraints>
-              <grid row="0" column="2" row-span="2" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Logar"/>

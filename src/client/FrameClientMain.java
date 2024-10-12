@@ -51,6 +51,7 @@ public class FrameClientMain extends JFrame{
     private JButton jgame7Button;
     private JButton jgame8Button;
     private JButton jplayButton;
+    private JButton jCriarButton;
 
 
     public FrameClientMain() {
@@ -154,6 +155,12 @@ public class FrameClientMain extends JFrame{
                 gameButtonPressed(jgame8Button);
             }
         });
+        jCriarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonCriarPressed();
+            }
+        });
     }
 
     //Comandos quando o botão conectar é pressionado
@@ -163,7 +170,7 @@ public class FrameClientMain extends JFrame{
 
             clientThread = new ClientThread(socket, jFrame, jconnectionPanel, jipTextField, jportTextField, jconnectButton,
                     juserDataPanel, jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1, jusersPanel,
-                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jgametextArea, jplayButton);
+                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jgametextArea, jplayButton, jCriarButton);
 
             clientThread.start();
 
@@ -192,10 +199,29 @@ public class FrameClientMain extends JFrame{
 
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeBytes("L\n");
+            Thread.sleep(1000);
             outputStream.writeBytes(jusernameTextField.getText() + "\n");
             Thread.sleep(1000);
             outputStream.writeBytes(jpasswordField.getText() + "\n");
             jloginButton.setVisible(false);
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    //Comandos quando o botão criar é pressionado
+    private void buttonCriarPressed(){
+
+        try {
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeBytes("C\n");
+            Thread.sleep(1000);
+            outputStream.writeBytes(jusernameTextField.getText() + "\n");
+            Thread.sleep(1000);
+            outputStream.writeBytes(jpasswordField.getText() + "\n");
+
+            jCriarButton.setVisible(false);
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
         }

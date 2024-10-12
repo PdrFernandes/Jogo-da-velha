@@ -31,6 +31,10 @@ public class ThreadServer extends Thread{
             while (flag) {
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entrada));
+                String acao = bufferedReader.readLine();
+
+                entrada = new DataInputStream(socket.getInputStream());
+                bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 name = bufferedReader.readLine();
 
                 entrada = new DataInputStream(socket.getInputStream());
@@ -38,20 +42,35 @@ public class ThreadServer extends Thread{
                 String psswrd = bufferedReader.readLine();
 
                 System.out.println(name + " " + psswrd);
-
-                List<Map<String, Object>> loginList = sel_login(name, psswrd);
-
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                System.out.println(loginList);
 
-                if (!loginList.isEmpty()  && !onlineClients.containsKey(name)) {
-                    outputStream.writeBytes("E;1\n");
-                    System.out.println("E;1\n");
-                    flag = false;
+                if (Objects.equals(acao, "L")) {
+                    List<Map<String, Object>> loginList = sel_login(name, psswrd);
+
+                    System.out.println(loginList);
+
+                    if (!loginList.isEmpty()  && !onlineClients.containsKey(name)) {
+                        outputStream.writeBytes("E;1\n");
+                        System.out.println("E;1\n");
+                        flag = false;
+                    } else {
+                        outputStream.writeBytes("E;0\n");
+                        System.out.println("E;0\n");
+                    }
                 } else {
-                    outputStream.writeBytes("E;0\n");
-                    System.out.println("E;0\n");
+                    List<Map<String, Object>> listaUsuarios = sel_usuario_username_literal(name);
+
+                    if(listaUsuarios.isEmpty()) {
+                        //Caso o usuário não esteja em uso, cria o usuário
+                        ins_usuario("", name, psswrd);
+                        outputStream.writeBytes("F;1\n");
+
+                    } else {
+                        outputStream.writeBytes("F;0\n");
+                    }
+
                 }
+
             }
 
             flag = true;
