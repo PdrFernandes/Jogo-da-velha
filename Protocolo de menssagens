@@ -37,7 +37,7 @@ Protocolo cliente -> servidor:
     D\n
 
     Mensagem de Adicionar Amigo (codigo E):
-        D;nome do amigo a ser adicionado\n
+        E;nome do amigo a ser adicionado\n
 
 Protocolo servidor -> cliente:
 
