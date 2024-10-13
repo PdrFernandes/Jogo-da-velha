@@ -34,7 +34,9 @@ public class ClientThread extends Thread{
     private final JTextArea jmsgTextArea;
     private final JTextField jsendMsgTextField;
     private final JList<String> jList;
-
+    private final JTextField jUsrAmizadeTextField;
+    private final JButton jAdicionarButton;
+    private final JPanel jAmizadePanel;
     private final JTextArea jgametextArea;
     private final JButton jplayButton;
 
@@ -42,7 +44,7 @@ public class ClientThread extends Thread{
     public ClientThread(Socket socket, FrameClientMain frameClientMain, JPanel jconnectionPanel,JTextField jipTextField, JTextField jportTextField, JButton jconnectButton,
                         JPanel juserDataPanel ,JButton jloginButton, JTextField jusernameTextField, JPasswordField jpasswordField, JButton jdesconectarButton,
                         JList<String> jList, JPanel jusersPanel, JPanel jgamePanel, JPanel jmsgPanel, JTextArea jmsgTextArea, JTextField jsendMsgTextField,
-                        JTextArea jgametextArea, JButton jplayButton, JButton jCriarButton) {
+                        JTextArea jgametextArea, JButton jplayButton, JButton jCriarButton, JButton jAdicionarButton, JTextField jUsrAmizadeTextField, JPanel jAmizadePanel) {
         this.socket = socket;
         this.frameClientMain = frameClientMain;
         this.jconnectionPanel = jconnectionPanel;
@@ -63,6 +65,9 @@ public class ClientThread extends Thread{
         this.jsendMsgTextField = jsendMsgTextField;
         this.jgametextArea = jgametextArea;
         this.jplayButton = jplayButton;
+        this.jAdicionarButton = jAdicionarButton;
+        this.jUsrAmizadeTextField = jUsrAmizadeTextField;
+        this.jAmizadePanel= jAmizadePanel;
 
     }
 
@@ -115,6 +120,9 @@ public class ClientThread extends Thread{
                         break;
                     case "F":
                         criarMsg(msgFields);
+                        break;
+                    case "G":
+                        adicionarMsg(msgFields);
                         break;
                     default:
                         System.out.println(msg);
@@ -217,6 +225,14 @@ public class ClientThread extends Thread{
         }
     }
 
+    private void adicionarMsg(String[] msgField){
+        if (Objects.equals(msgField[1], "0")) {
+            jUsrAmizadeTextField.setText("Você já é amigo ou este usuário não existe.");
+        }
+        jAdicionarButton.setVisible(true);
+        jUsrAmizadeTextField.setText("");
+    }
+
     private void loginMsg(String[] msgField){
         if (Objects.equals(msgField[1], "1")) {
 
@@ -229,6 +245,7 @@ public class ClientThread extends Thread{
             jgamePanel.setVisible(true);
             jmsgPanel.setVisible(true);
             jusersPanel.setVisible(true);
+            jAmizadePanel.setVisible(true);
 
             this.setName(jusernameTextField.getText());
             System.out.println("Voce realizou o login com sucesso!");
@@ -258,6 +275,7 @@ public class ClientThread extends Thread{
         jusersPanel.setVisible(false);
         jgamePanel.setVisible(false);
         jmsgPanel.setVisible(false);
+        jAmizadePanel.setVisible(false);
 
         flag = false;
         socket.close();

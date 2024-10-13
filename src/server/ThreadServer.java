@@ -103,12 +103,43 @@ public class ThreadServer extends Thread{
                         disconnect();
                         flag = false;
                         continue;
+                    case "E":
+                        adicionarAmigo(msgFields);
                     default:
                         System.out.println("Mensagem de " + Thread.currentThread().getName() + ": " + Arrays.toString(msgFields));
                         break;
                 }
             }
         } catch (IOException | InterruptedException | SQLException ex ) {
+            Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void adicionarAmigo (String[] msgFields) {
+        try {
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+
+            int id_usuario = Integer.parseInt(
+                    (sel_usuario_username_literal(this.getName()).getFirst()).get("id_usuario").toString());
+            List<Map<String, Object>> listaAmigo =sel_usuario_username_literal(msgFields[1]);
+
+            //Caso não encontre o usuário
+            if (listaAmigo.isEmpty()) {
+                outputStream.writeBytes("G;0\n");
+                return;
+            }
+
+            int id_amigo = Integer.parseInt(
+                    (listaAmigo.getFirst()).get("id_usuario").toString());
+
+            //Se a relação já não existe, a adiciona
+            if (sel_amizade(id_usuario, id_amigo).isEmpty()) {
+                ins_amizade(id_usuario, id_amigo);
+                outputStream.writeBytes("G;1\n");
+            } else {
+                outputStream.writeBytes("G;0\n");
+            }
+        } catch (IOException | SQLException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

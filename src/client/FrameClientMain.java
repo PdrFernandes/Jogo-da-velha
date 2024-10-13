@@ -52,6 +52,9 @@ public class FrameClientMain extends JFrame{
     private JButton jgame8Button;
     private JButton jplayButton;
     private JButton jCriarButton;
+    private JTextField jUsrAmizadeTextField;
+    private JButton jAdicionarButton;
+    private JPanel jAmizadePanel;
 
 
     public FrameClientMain() {
@@ -161,6 +164,24 @@ public class FrameClientMain extends JFrame{
                 buttonCriarPressed();
             }
         });
+        jAdicionarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonAdicionarPressed();
+            }
+        });
+    }
+
+    //Comandos quando o botão adicionar é pressionado
+    private void buttonAdicionarPressed () {
+            try {
+                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                outputStream.writeBytes( "E;" + jUsrAmizadeTextField.getText() + "\n");
+                jAdicionarButton.setVisible(false);
+            } catch (IOException ex) {
+                Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
     }
 
     //Comandos quando o botão conectar é pressionado
@@ -170,7 +191,7 @@ public class FrameClientMain extends JFrame{
 
             clientThread = new ClientThread(socket, jFrame, jconnectionPanel, jipTextField, jportTextField, jconnectButton,
                     juserDataPanel, jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1, jusersPanel,
-                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jgametextArea, jplayButton, jCriarButton);
+                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jgametextArea, jplayButton, jCriarButton, jAdicionarButton, jUsrAmizadeTextField, jAmizadePanel);
 
             clientThread.start();
 
@@ -387,6 +408,7 @@ public class FrameClientMain extends JFrame{
         jFrame.jgamePanel.setVisible(false);
         jFrame.jmsgPanel.setVisible(false);
         jFrame.jusersPanel.setVisible(false);
+        jFrame.jAmizadePanel.setVisible(false);
         jFrame.juserListScrollPane.setViewportView(jFrame.jlist1);
         jFrame.jmsgScrollPane.setViewportView(jFrame.jmsgTextArea);
         jFrame.setVisible(true);

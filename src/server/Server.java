@@ -6,7 +6,7 @@ import java.sql.*;
 public class Server {
     //String usada para conectar no nosso banco de dados
     public static String connectionUrl =
-    "jdbc:sqlserver://redes-jogo-da-velha.database.windows.net:1433;database=jogo_da_velha;user=redes@redes-jogo-da-velha;password=sered_123;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
+    "jdbc:sqlserver://redes-jogo-da-velha.database.windows.net:1433;database=jogo_da_velha;user=redes@redes-jogo-da-velha;password=sered_123;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
 
     public static void main(String[] args) {
     	/* SUMÁRIO

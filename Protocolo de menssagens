@@ -3,11 +3,16 @@ definidos como uma letra em maiusculo, em seguida seus campos são divididos pel
 conforme a mensagem e sentido (cliente -> servidor ou servidor -> cliente) e é finalizada por "\n",
 pois para ler está sendo utilizado o metodo readLine. (podia definir o primeiro campo e depois disso os
 bytes eram dividos automaticamente sem precisar de separador e só os numero do byte mas como da mais trabalho fiz assim)
-Existe a mensagem de login que foge do protoclo inicial, ela envia o nome de usuario e senha para o servidor
+Existe a mensagem de login/criar que foge do protoclo inicial, ela envia o nome de usuario e senha para o servidor
 
 Protocolo cliente -> servidor:
 
-    Mensagem de Login:
+    Mensagem de Login (Código L):
+        São duas mensagens:
+        nome\n
+
+        senha\n
+    Mensagem de Criar (Código C):
         São duas mensagens:
         nome\n
 
@@ -30,6 +35,9 @@ Protocolo cliente -> servidor:
 
     Mensagem de desconectar (codigo D):
     D\n
+
+    Mensagem de Adicionar Amigo (codigo E):
+        D;nome do amigo a ser adicionado\n
 
 Protocolo servidor -> cliente:
 
@@ -87,3 +95,17 @@ Protocolo servidor -> cliente:
 
         Se o login deu errado:
             E;O\n
+
+    Mensagem de Criar(Codigo F):
+            Se o criar deu certo:
+                F;1\n
+
+            Se o criar deu errado:
+                F;O\n
+
+    Mensagem de Adicionar(Codigo G):
+                Se o adicionar deu certo:
+                    G;1\n
+
+                Se o adicionar deu errado:
+                    G;O\n
