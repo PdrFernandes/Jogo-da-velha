@@ -2,9 +2,9 @@ package server;
 
 import java.io.*;
 import java.net.*;
-import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ServerMain {
 
@@ -13,6 +13,8 @@ public class ServerMain {
     public static HashMap<String, ThreadServer> threadsOline = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
+        //pool para melhor controle das threads
+        ExecutorService pool = Executors.newCachedThreadPool();
         ServerSocket serverSocket = new ServerSocket(port);
 
         System.out.println("IP do servidor: " + serverSocket.getInetAddress().getHostName());
@@ -22,9 +24,9 @@ public class ServerMain {
             Socket socket;
             socket = serverSocket.accept();
 
-            ThreadServer threadServer = new ThreadServer(socket);
-            System.out.println(threadServer.getName() + " conectado");
-            threadServer.start();
+            pool.submit(new ThreadServer(socket));
+
+            System.out.println(pool);
         }
     }
 }
