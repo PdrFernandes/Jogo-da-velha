@@ -250,9 +250,12 @@ public class ClientThread extends Thread{
     //Registrar possivel erro de criacao de login
     private void criarMsg(String[] msgField){
         if (Objects.equals(msgField[1], "0")) {
-            jCriarButton.setEnabled(true);
             jusernameTextField.setText("Este usuário já está em uso. Tente novamente!");
+        } else {
+            jusernameTextField.setText("Criado com sucesso!");
+            jpasswordField.setText("");
         }
+        jCriarButton.setEnabled(true);
     }
 
     //Registrar a adicao de amizade (erro ou deu certo)
