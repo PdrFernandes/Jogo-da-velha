@@ -34,6 +34,7 @@ public class ClientThread extends Thread{
     private final JTextArea jmsgTextArea;
     private final JTextField jsendMsgTextField;
     private final JList<String> jList;
+    private final JList<String> jList2;
     private final JTextField jUsrAmizadeTextField;
     private final JButton jAdicionarButton;
     private final JPanel jAmizadePanel;
@@ -41,9 +42,9 @@ public class ClientThread extends Thread{
     private final JButton jplayButton;
 
     //O construtor recebe os elementos do JFrame para poder editar eles
-    public ClientThread(Socket socket, FrameClientMain frameClientMain, JPanel jconnectionPanel,JTextField jipTextField, JTextField jportTextField, JButton jconnectButton,
-                        JPanel juserDataPanel ,JButton jloginButton, JTextField jusernameTextField, JPasswordField jpasswordField, JButton jdesconectarButton,
-                        JList<String> jList, JPanel jusersPanel, JPanel jgamePanel, JPanel jmsgPanel, JTextArea jmsgTextArea, JTextField jsendMsgTextField,
+    public ClientThread(Socket socket, FrameClientMain frameClientMain, JPanel jconnectionPanel, JTextField jipTextField, JTextField jportTextField, JButton jconnectButton,
+                        JPanel juserDataPanel , JButton jloginButton, JTextField jusernameTextField, JPasswordField jpasswordField, JButton jdesconectarButton,
+                        JList<String> jList, JPanel jusersPanel, JPanel jgamePanel, JPanel jmsgPanel, JTextArea jmsgTextArea, JTextField jsendMsgTextField, JList<String> jList2,
                         JTextArea jgametextArea, JButton jplayButton, JButton jCriarButton, JButton jAdicionarButton, JTextField jUsrAmizadeTextField, JPanel jAmizadePanel) {
         this.socket = socket;
         this.frameClientMain = frameClientMain;
@@ -53,6 +54,7 @@ public class ClientThread extends Thread{
         this.jconnectButton = jconnectButton;
         this.juserDataPanel = juserDataPanel;
         this.jloginButton = jloginButton;
+        this.jList2 = jList2;
         this.jCriarButton = jCriarButton;
         this.jusernameTextField = jusernameTextField;
         this.jpasswordField = jpasswordField;
@@ -93,14 +95,16 @@ public class ClientThread extends Thread{
                 switch (msgFields[0]) {
                     case "A":
                         displayMsgFromClient(msgFields);
-                        System.out.println("Mensagem de " + msgFields[1] + ": " + msgFields[3]);
                         break;
                     case "B":
-                        displayOnlineClients(msgFields);
+                        if (Objects.equals(msgFields[1], "1")) {
+                            displayOnlineClients(msgFields);
+                        } else {
+                            displayFriends(msgFields);
+                        }
                         break;
                     case "C":
                         if (isPlaying) {
-                            System.out.println("recebi jogada");
                             recordPlay(msgFields);
                             break;
                         }
@@ -125,7 +129,7 @@ public class ClientThread extends Thread{
                         adicionarMsg(msgFields);
                         break;
                     default:
-                        System.out.println(msg);
+                        break;
                 }
 
             }
@@ -135,14 +139,17 @@ public class ClientThread extends Thread{
 
     }
 
+    //Registrar mensagem recebida de outro cliente
     private void displayMsgFromClient(String[] msgField){
         String msg = "Mensagem de " + msgField[1] + " :>" + msgField[3];
         jmsgTextArea.append(msg + "\n");
         jmsgTextArea.setCaretPosition(jmsgTextArea.getDocument().getLength() - 1);
     }
 
+    //Atualizar a visualizacao dos clientes online
     private void displayOnlineClients (String[] msgField){
         ArrayList<String> usuariosOnline = new ArrayList<>(Arrays.asList(msgField));
+        usuariosOnline.removeFirst();
         usuariosOnline.removeFirst();
         usuariosOnline.remove(jusernameTextField.getText());
 
@@ -151,6 +158,22 @@ public class ClientThread extends Thread{
         model.clear();
 
         for(String usuario: usuariosOnline){
+            model.addElement(usuario);
+        }
+    }
+
+    //Atualizar a visualizacao das amizades
+    private void displayFriends(String[] msgField){
+        ArrayList<String> amizades = new ArrayList<>(Arrays.asList(msgField));
+        amizades.removeFirst();
+        amizades.removeFirst();
+        amizades.remove(jusernameTextField.getText());
+
+        DefaultListModel model = new DefaultListModel();
+        this.jList2.setModel(model);
+        model.clear();
+
+        for(String usuario: amizades){
             model.addElement(usuario);
         }
     }
@@ -166,10 +189,10 @@ public class ClientThread extends Thread{
 
         if (Objects.equals(msgFields[2], "1")){
             frameClientMain.ativarGameButtons();
-            jgametextArea.setText("Sua vez de jogar! ");
+            jgametextArea.append("\nSua vez de jogar! ");
         } else {
             frameClientMain.desativarGameButtons();
-            jgametextArea.setText("Aguardando o oponente jogar! ");
+            jgametextArea.append("\nAguardando o oponente jogar! ");
         }
     }
 
@@ -183,7 +206,7 @@ public class ClientThread extends Thread{
         }
     }
 
-    //Chamada para registrar a jogada ou resultado do jogo
+    //Registrar a jogada ou resultado do jogo
     private void recordPlay(String[] msgFields){
         if (Objects.equals(msgFields[1], "1")) {
 
@@ -200,9 +223,15 @@ public class ClientThread extends Thread{
         }
         else if (Objects.equals(msgFields[1], "2")){
 
-            jgametextArea.setText("O jogo empatou!");
+            if (Objects.equals(msgFields[2], "1")) {
+                jgametextArea.setText("O jogo terminou! O seu oponente se desconectou.");
+            } else {
+                jgametextArea.setText("O jogo empatou!");
+            }
+
             isPlaying = false;
             frameClientMain.resetGameButtons();
+            frameClientMain.desativarGameButtons();
             jplayButton.setEnabled(true);
 
         } else if (Objects.equals(msgFields[2], "1")){
@@ -218,26 +247,35 @@ public class ClientThread extends Thread{
         }
     }
 
+    //Registrar possivel erro de criacao de login
     private void criarMsg(String[] msgField){
         if (Objects.equals(msgField[1], "0")) {
-            jCriarButton.setVisible(true);
+            jCriarButton.setEnabled(true);
             jusernameTextField.setText("Este usuário já está em uso. Tente novamente!");
         }
     }
 
+    //Registrar a adicao de amizade (erro ou deu certo)
     private void adicionarMsg(String[] msgField){
         if (Objects.equals(msgField[1], "0")) {
             jUsrAmizadeTextField.setText("Você já é amigo ou este usuário não existe.");
+        } else {
+            jUsrAmizadeTextField.setText("");
         }
-        jAdicionarButton.setVisible(true);
-        jUsrAmizadeTextField.setText("");
+        jAdicionarButton.setEnabled(true);
+
     }
 
+    //Chamada para o login (erro ou deu certo)
     private void loginMsg(String[] msgField){
         if (Objects.equals(msgField[1], "1")) {
 
             this.frameClientMain.desabilitarTextField(jusernameTextField);
             jpasswordField.setEditable(false);
+            jloginButton.setVisible(false);
+            jCriarButton.setVisible(false);
+            jloginButton.setEnabled(true);
+            jCriarButton.setEnabled(true);
             jpasswordField.setBackground(Color.GRAY);
 
             jdesconectarButton.setVisible(true);
@@ -251,18 +289,27 @@ public class ClientThread extends Thread{
             System.out.println("Voce realizou o login com sucesso!");
         } else {
 
-            jloginButton.setVisible(true);
+            jloginButton.setEnabled(true);
+            jCriarButton.setEnabled(true);
             jusernameTextField.setText("Usuario e/ou senha errados. Tente novamente");
             System.out.println("Usuario e/ou senha errados");
 
         }
     }
 
+    //Chamada para a desconexao
     private void desconectar() throws IOException {
+        //Reseta as configuracoes
+        if (isPlaying){
+            isPlaying = false;
+            frameClientMain.resetGameButtons();
+            frameClientMain.desativarGameButtons();
+            jplayButton.setEnabled(true);
+        }
+        jgametextArea.setText("Selecione um oponente e clique em Jogar!");
+
         jconnectionPanel.setVisible(true);
-
         jdesconectarButton.setVisible(false);
-
         juserDataPanel.setVisible(false);
         jusernameTextField.setEditable(true);
         jusernameTextField.setBackground(Color.WHITE);
@@ -271,11 +318,13 @@ public class ClientThread extends Thread{
         jpasswordField.setBackground(Color.WHITE);
         jpasswordField.setText("");
         jloginButton.setVisible(true);
-
+        jmsgTextArea.setText("");
         jusersPanel.setVisible(false);
         jgamePanel.setVisible(false);
         jmsgPanel.setVisible(false);
         jAmizadePanel.setVisible(false);
+        jCriarButton.setVisible(true);
+        jCriarButton.setEnabled(true);
 
         flag = false;
         socket.close();

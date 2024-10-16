@@ -55,6 +55,9 @@ public class FrameClientMain extends JFrame{
     private JTextField jUsrAmizadeTextField;
     private JButton jAdicionarButton;
     private JPanel jAmizadePanel;
+    private JScrollPane JuserAmizadesScrollPane;
+    private JList<String> jlist2;
+    private JPanel jgameButtonsPanel;
 
 
     public FrameClientMain() {
@@ -176,8 +179,12 @@ public class FrameClientMain extends JFrame{
     private void buttonAdicionarPressed () {
             try {
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                outputStream.writeBytes( "E;" + jUsrAmizadeTextField.getText() + "\n");
-                jAdicionarButton.setVisible(false);
+                if (Objects.equals(jUsrAmizadeTextField.getText(), "") || Objects.equals(jUsrAmizadeTextField.getText(), null)) {
+                    jUsrAmizadeTextField.setText("Digite o nome do jogador");
+                } else {
+                    outputStream.writeBytes("E;" + jUsrAmizadeTextField.getText() + "\n");
+                    jAdicionarButton.setEnabled(false);
+                }
             } catch (IOException ex) {
                 Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -188,10 +195,11 @@ public class FrameClientMain extends JFrame{
     private void buttonConectarPressed () {
         try {
             socket = new Socket(jipTextField.getText(), Integer.parseInt(jportTextField.getText()));
+            socket.setKeepAlive(true);
 
             clientThread = new ClientThread(socket, jFrame, jconnectionPanel, jipTextField, jportTextField, jconnectButton,
                     juserDataPanel, jloginButton, jusernameTextField, jpasswordField, jdesconectarButton, jlist1, jusersPanel,
-                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jgametextArea, jplayButton, jCriarButton, jAdicionarButton, jUsrAmizadeTextField, jAmizadePanel);
+                    jgamePanel, jmsgPanel, jmsgTextArea, jsendMsgTextField, jlist2,jgametextArea, jplayButton, jCriarButton, jAdicionarButton, jUsrAmizadeTextField, jAmizadePanel);
 
             clientThread.start();
 
@@ -225,7 +233,8 @@ public class FrameClientMain extends JFrame{
             outputStream.writeBytes(jusernameTextField.getText() + "\n");
             Thread.sleep(1000);
             outputStream.writeBytes(jpasswordField.getText() + "\n");
-            jloginButton.setVisible(false);
+            jloginButton.setEnabled(false);
+            jCriarButton.setEnabled(false);
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -242,7 +251,7 @@ public class FrameClientMain extends JFrame{
             Thread.sleep(1000);
             outputStream.writeBytes(jpasswordField.getText() + "\n");
 
-            jCriarButton.setVisible(false);
+            jCriarButton.setEnabled(false);
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -286,10 +295,11 @@ public class FrameClientMain extends JFrame{
                 Logger.getLogger(FrameClientMain.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            jgametextArea.setText("Selecione um jogador antes de enviar menssagem!");
+            jgametextArea.setText("Selecione um jogador antes de jogar!");
         }
     }
 
+    //Comandos quando o botão do jogo (um dos 9 botoes) é pressionado
     private void gameButtonPressed(JButton gameButton){
         String botao = gameButton.getName();
         gameButton.setText(player);
@@ -401,7 +411,7 @@ public class FrameClientMain extends JFrame{
         jFrame.setContentPane(jFrame.jallPanel);
         jFrame.setTitle("Jogo da velha");
         jFrame.setLocationRelativeTo(null);
-        jFrame.setSize(600, 400);
+        jFrame.setSize(800, 800);
         jFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         jFrame.jdesconectarButton.setVisible(false);
         jFrame.juserDataPanel.setVisible(false);
