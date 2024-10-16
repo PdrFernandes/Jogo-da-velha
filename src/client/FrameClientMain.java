@@ -229,9 +229,9 @@ public class FrameClientMain extends JFrame{
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("L\n");
-            Thread.sleep(1000);
+            Thread.sleep(500);
             outputStream.writeBytes(jusernameTextField.getText() + "\n");
-            Thread.sleep(1000);
+            Thread.sleep(500);
             outputStream.writeBytes(jpasswordField.getText() + "\n");
             jloginButton.setEnabled(false);
             jCriarButton.setEnabled(false);
@@ -246,9 +246,9 @@ public class FrameClientMain extends JFrame{
         try {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("C\n");
-            Thread.sleep(1000);
+            Thread.sleep(500);
             outputStream.writeBytes(jusernameTextField.getText() + "\n");
-            Thread.sleep(1000);
+            Thread.sleep(500);
             outputStream.writeBytes(jpasswordField.getText() + "\n");
 
             jCriarButton.setEnabled(false);
