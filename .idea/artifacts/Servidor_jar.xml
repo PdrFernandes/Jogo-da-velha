@@ -6,7 +6,7 @@
         <element id="file-copy" path="$PROJECT_DIR$/src/server/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="Trabalho-Redes" />
-      <element id="file-copy" path="$PROJECT_DIR$/src/server/mssql-jdbc-12.8.1.jre11.jar" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/server/lib/mssql-jdbc-12.8.1.jre11.jar" />
     </root>
   </artifact>
 </component>

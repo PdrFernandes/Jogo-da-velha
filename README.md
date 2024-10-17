@@ -3,11 +3,11 @@
 **Cliente:** 
 
     Main está em: src/client/FrameClientMain.java 
-    Executavel(.jar) em: out/artifacts/Cliente_jar/Cliente.jar 
+    Executavel(.jar) em: Cliente.jar
 **Servidor:** 
 
     main está em: src/server/ServerMain.java 
-    Executavel(.jar) em: out/artifacts/Servidor_jar/Servidor.jar 
+    Executavel(.jar): por usar biblioteca externa não conseguimos gera executavel
 
 
 Recomendamos rodar por terminal. Existe também o main do banco de daods para fazer certas consultas e excluir 
