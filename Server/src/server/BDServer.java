@@ -91,9 +91,9 @@ public class BDServer {
         //Tenta estabelecer a conexão
         try (Connection con = DriverManager.getConnection(BDServer.connectionUrl);) {
             CallableStatement call = con.prepareCall("{ call sel_amizade(?, ?) }");
-            if (id_1 == null) call.setNull(1, java.sql.Types.NVARCHAR);
+            if (id_1 == null) call.setNull(1, Types.NVARCHAR);
             else call.setInt(1, id_1);
-            if (id_2 == null) call.setNull(2, java.sql.Types.NVARCHAR);
+            if (id_2 == null) call.setNull(2, Types.NVARCHAR);
             else call.setInt(2, id_2);
             
             //Executa a procedure
@@ -136,9 +136,9 @@ public class BDServer {
         //Tenta estabelecer a conexão
         try (Connection con = DriverManager.getConnection(BDServer.connectionUrl);) {
             CallableStatement call = con.prepareCall("{ call sel_amizade_usuario(?, ?) }");
-            if (id_1 == null) call.setNull(1, java.sql.Types.NVARCHAR);
+            if (id_1 == null) call.setNull(1, Types.NVARCHAR);
             else call.setInt(1, id_1);
-            if (id_2 == null) call.setNull(2, java.sql.Types.NVARCHAR);
+            if (id_2 == null) call.setNull(2, Types.NVARCHAR);
             else call.setInt(2, id_2);
 
             //Executa a procedure
@@ -221,7 +221,7 @@ public class BDServer {
         try (Connection con = DriverManager.getConnection(BDServer.connectionUrl);) {
             CallableStatement call = con.prepareCall("{ call sel_usuario_username(?) }");
             //Define os parâmetros (precisam ser definidos em ordem, ver procedure para saber a ordem)
-            if (username == null) call.setNull(1, java.sql.Types.NVARCHAR);
+            if (username == null) call.setNull(1, Types.NVARCHAR);
             else call.setString(1, username);
             
             //Executa a procedure
@@ -262,7 +262,7 @@ public class BDServer {
         try (Connection con = DriverManager.getConnection(BDServer.connectionUrl);) {
             CallableStatement call = con.prepareCall("{ call sel_usuario(?) }");
             //Define os parâmetros (precisam ser definidos em ordem, ver procedure para saber a ordem)
-            if (id == null) call.setNull(1, java.sql.Types.NVARCHAR);
+            if (id == null) call.setNull(1, Types.NVARCHAR);
             else call.setInt(1, id);
             
             
@@ -306,9 +306,9 @@ public class BDServer {
         try (Connection con = DriverManager.getConnection(BDServer.connectionUrl);) {
             CallableStatement call = con.prepareCall("{ call sel_login(?, ?) }");
             //Define os parâmetros (precisam ser definidos em ordem, ver procedure para saber a ordem)
-            if (username == null) call.setNull(1, java.sql.Types.NVARCHAR);
+            if (username == null) call.setNull(1, Types.NVARCHAR);
             else call.setString(1, username);
-            if (senha == null) call.setNull(2, java.sql.Types.NVARCHAR);
+            if (senha == null) call.setNull(2, Types.NVARCHAR);
             else call.setString(2, senha);
             
             //Executa a procedure

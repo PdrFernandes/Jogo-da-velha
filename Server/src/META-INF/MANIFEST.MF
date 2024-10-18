@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: server/lib/mssql-jdbc-12.8.1.jre11.jar
+Class-Path: mssql-jdbc-12.8.1.jre11
 Main-Class: server.ServerMain
 
