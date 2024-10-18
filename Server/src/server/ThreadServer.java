@@ -19,8 +19,19 @@ public class ThreadServer extends Thread{
     boolean isplaying = false;
     ThreadServer oponente;
 
+    BufferedReader bufferedReader;
+    DataOutputStream outputStream;
+
     public ThreadServer (Socket socket){
         this.socket = socket;
+
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(new DataInputStream(socket.getInputStream())));
+            outputStream = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException ex ) {
+            Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            disconnectException();
+        }
     }
 
     @Override
@@ -30,19 +41,11 @@ public class ThreadServer extends Thread{
         try {
             //Loop reponsavel pelo login/criar login
             while (flag) {
-                DataInputStream entrada = new DataInputStream(socket.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 String acao = bufferedReader.readLine();
 
-                entrada = new DataInputStream(socket.getInputStream());
-                bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 name = bufferedReader.readLine();
 
-                entrada = new DataInputStream(socket.getInputStream());
-                bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 String psswrd = bufferedReader.readLine();
-
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
                 System.out.println(acao +" " + name + " " + psswrd);
 
@@ -87,8 +90,6 @@ public class ThreadServer extends Thread{
 
             //Loop reponsavel por receber as mensagem do cliente e decodificar
             while (flag) {
-                DataInputStream entrada = new DataInputStream(socket.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 msg = bufferedReader.readLine();
                 String[] msgFields = msg.split(";");
 
@@ -125,7 +126,6 @@ public class ThreadServer extends Thread{
     //Tenta adicionar amizade e envia para o cliente se deu erro ou nao
     private void adicionarAmigo (String[] msgFields) {
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
             int id_usuario = Integer.parseInt(
                     (sel_usuario_username_literal(this.getName()).getFirst()).get("id_usuario").toString());
@@ -158,8 +158,8 @@ public class ThreadServer extends Thread{
     private void sendMsgToClient (String[] msgFields) {
         try {
             if (onlineClients.get(msgFields[2]) != null) {
-                DataOutputStream outputStream = new DataOutputStream(onlineClients.get(msgFields[2]).getOutputStream());
-                outputStream.writeBytes(msg + "\n");
+                DataOutputStream outputStreamOthreClient = new DataOutputStream(onlineClients.get(msgFields[2]).getOutputStream());
+                outputStreamOthreClient.writeBytes(msg + "\n");
             }
         } catch (IOException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -172,7 +172,6 @@ public class ThreadServer extends Thread{
         String resultado = String.join(";", onlineClients.keySet());
 
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("B;1;" + resultado + "\n");
         } catch (IOException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -202,7 +201,6 @@ public class ThreadServer extends Thread{
         String resultado = String.join(";", amigos);
 
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("B;0;" + resultado + "\n");
         } catch (IOException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,8 +212,8 @@ public class ThreadServer extends Thread{
 
         try {
             if (isplaying) {
-                DataOutputStream outputStream = new DataOutputStream(oponente.socket.getOutputStream());
-                outputStream.writeBytes("C;2;1\n");
+                DataOutputStream outputStreamOponente = new DataOutputStream(oponente.socket.getOutputStream());
+                outputStreamOponente.writeBytes("C;2;1\n");
 
                 oponente.isplaying = false;
                 oponente.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
@@ -230,7 +228,6 @@ public class ThreadServer extends Thread{
             onlineClients.remove(this.getName());
             threadsOline.remove(this.getName());
 
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("D\n");
 
             System.out.println("Disconnecting " + this.getName());
@@ -253,13 +250,12 @@ public class ThreadServer extends Thread{
 
         if (onlineClients.get(msgFields[3]) != null && !isplaying && !oponente.isplaying){
             try {
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes("C;0;1;" + msgFields[3] + ";" + "X" + "\n");
 
                 Thread.sleep(100);
 
-                outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
-                outputStream.writeBytes("C;0;0;" + msgFields[2] + ";" + "O" + "\n");
+                DataOutputStream outputStreamOponente = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
+                outputStreamOponente.writeBytes("C;0;0;" + msgFields[2] + ";" + "O" + "\n");
 
                 oponente.isplaying = true;
                 oponente.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
@@ -278,7 +274,6 @@ public class ThreadServer extends Thread{
             }
         } else {
             try {
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 if (oponente.isplaying) {
                     outputStream.writeBytes("C;1;1;" + msgFields[3] + "\n");
                 } else {
@@ -295,16 +290,22 @@ public class ThreadServer extends Thread{
     private void sendMoveGame(String[] msgFields) {
         tabuleiro[Integer.parseInt(msgFields[4])] = msgFields[5];
 
+        DataOutputStream outputStreamOponente;
+        try {
+            outputStreamOponente = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         if (checkWinner(msgFields[5])){
             try {
                 System.out.println("Winner " + msgFields[3]);
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes("C;1;1;" + msgFields[3] + "\n");
 
                 Thread.sleep(100);
 
-                outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
-                outputStream.writeBytes("C;1;0;" + msgFields[2] + "\n");
+
+                outputStreamOponente.writeBytes("C;1;0;" + msgFields[2] + "\n");
 
                 oponente.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
                 oponente.isplaying = false;
@@ -320,13 +321,11 @@ public class ThreadServer extends Thread{
         else if (isBoardFull()){
             try {
                 System.out.println("Draw");
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes("C;2;0\n");
 
                 Thread.sleep(100);
 
-                outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
-                outputStream.writeBytes("C;2;0\n");
+                outputStreamOponente.writeBytes("C;2;0\n");
 
                 oponente.tabuleiro = new String[]{"-", "-", "-", "-", "-", "-", "-", "-", "-"};
                 oponente.isplaying = false;
@@ -340,10 +339,8 @@ public class ThreadServer extends Thread{
             }
         } else {
             try {
-                DataOutputStream outputStream = new DataOutputStream(onlineClients.get(msgFields[3]).getOutputStream());
-                outputStream.writeBytes("C;0;1;" + msgFields[4] + ";" + msgFields[5] + "\n");
+                outputStreamOponente.writeBytes("C;0;1;" + msgFields[4] + ";" + msgFields[5] + "\n");
 
-                outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes("C;0;0\n");
 
             } catch (IOException ex) {

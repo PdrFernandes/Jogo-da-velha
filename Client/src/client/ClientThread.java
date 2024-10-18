@@ -16,6 +16,8 @@ public class ClientThread extends Thread{
     boolean isPlaying = false;
     boolean flag = true;
 
+    BufferedReader bufferedReader;
+
     private final FrameClientMain frameClientMain;
 
     private final JPanel jconnectionPanel;
@@ -71,14 +73,17 @@ public class ClientThread extends Thread{
         this.jUsrAmizadeTextField = jUsrAmizadeTextField;
         this.jAmizadePanel= jAmizadePanel;
 
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(new DataInputStream(socket.getInputStream())));
+        } catch (IOException ex) {
+            Logger.getLogger(ClientThread.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
     public void run(){
         try {
             while (flag) {
-                DataInputStream entrada = new DataInputStream(socket.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entrada));
                 msg = bufferedReader.readLine();
                 String[] msgFields;
 

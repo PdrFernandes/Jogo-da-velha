@@ -18,6 +18,8 @@ public class FrameClientMain extends JFrame{
     static Socket socket;
     ClientThread clientThread;
 
+    DataOutputStream outputStream;
+
     private static FrameClientMain jFrame;
 
     private JPanel jallPanel;
@@ -203,6 +205,8 @@ public class FrameClientMain extends JFrame{
 
             clientThread.start();
 
+            outputStream = new DataOutputStream(socket.getOutputStream());
+
             jconnectionPanel.setVisible(false);
             juserDataPanel.setVisible(true);
 
@@ -215,7 +219,6 @@ public class FrameClientMain extends JFrame{
     private void buttonDesonectarPressed () {
 
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes( "D\n");
 
         } catch (IOException ex) {
@@ -227,7 +230,6 @@ public class FrameClientMain extends JFrame{
     private void buttonLogarPressed(){
 
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("L\n");
             Thread.sleep(500);
             outputStream.writeBytes(jusernameTextField.getText() + "\n");
@@ -244,7 +246,6 @@ public class FrameClientMain extends JFrame{
     private void buttonCriarPressed(){
 
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes("C\n");
             Thread.sleep(500);
             outputStream.writeBytes(jusernameTextField.getText() + "\n");
@@ -261,7 +262,6 @@ public class FrameClientMain extends JFrame{
     private void buttonEnviarPressed(){
         if (!jlist1.isSelectionEmpty()) {
             try {
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes( "A;" + jusernameTextField.getText() + ";" + jlist1.getSelectedValue() + ";" + jsendMsgTextField.getText() + "\n");
 
             } catch (IOException ex) {
@@ -276,7 +276,6 @@ public class FrameClientMain extends JFrame{
     //Comandos quando o botão atualizar é pressionado
     private void buttonAtualizarPressed(){
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes( "B\n");
 
         } catch (IOException ex) {
@@ -288,7 +287,6 @@ public class FrameClientMain extends JFrame{
     private void buttonJogarPressed(){
         if (!jlist1.isSelectionEmpty()) {
             try {
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 outputStream.writeBytes( "C;1;" + jusernameTextField.getText() + ";" + jlist1.getSelectedValue() + "\n");
 
             } catch (IOException ex) {
@@ -306,7 +304,6 @@ public class FrameClientMain extends JFrame{
         gameButton.setEnabled(false);
 
         try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeBytes( "C;0;" + jusernameTextField.getText() + ";" + oponente + ";" + botao + ";" + player + "\n");
             desativarGameButtons();
 
